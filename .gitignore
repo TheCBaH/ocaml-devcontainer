@@ -1,0 +1,4 @@
+*.cm?
+/_build
+/cross
+/obj*

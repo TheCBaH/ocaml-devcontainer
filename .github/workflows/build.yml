@@ -31,3 +31,23 @@ jobs:
     - name: utop
       run: |
         echo 'Example.Hello.print ();;' | ${{ env.EXEC }} make utop
+    - name: native
+      run: |
+        ${{ env.EXEC }} make ffi.native
+        ${{ env.EXEC }} make WITH_VALGRIND=y ffi.run.native
+    - name: arm
+      run: |
+        ${{ env.EXEC }} make ffi.arm
+        ${{ env.EXEC }} make ffi.run.arm
+    - name: aarch64
+      run: |
+        ${{ env.EXEC }} make ffi.aarch64
+        ${{ env.EXEC }} make ffi.run.aarch64
+    - name: i386
+      run: |
+        ${{ env.EXEC }} make ffi.i386
+        ${{ env.EXEC }} make ffi.run.i386
+    - name: x86_64
+      run: |
+        ${{ env.EXEC }} make ffi.x86_64
+        ${{ env.EXEC }} make ffi.run.x86_64
