@@ -1,0 +1,3 @@
+[submodule ".modules/ocaml"]
+	path = .modules/ocaml
+	url = https://github.com/ocaml/ocaml.git

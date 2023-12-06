@@ -1,0 +1,38 @@
+all:
+	echo Not supported
+
+include cross/${ARCH}/ocaml.inc
+
+OBJ_DIR=obj.${ARCH}
+APP_SRCS=\
+ caml_runtime_allocator.c\
+ main_app.c\
+ obj/hello_bc.c\
+
+LIB_SRCS=\
+ ffi_c.c\
+ ffi_c_caml.c\
+
+vpath %.c ${OCAML_ROOT}/runtime src obj
+
+%/.exists:
+	mkdir -p $(basename $@)
+
+
+OCAML_RUNTIME_OBJS=$(addprefix ${OBJ_DIR}/, $(filter-out main.%,$(OCAML_RUNTIME_SOURCES:.c=.o)))
+APP_OBJS=$(addprefix ${OBJ_DIR}/, $(notdir $(APP_SRCS:.c=.o)))
+LIB_OBJS=$(addprefix ${OBJ_DIR}/, $(notdir $(LIB_SRCS:.c=.o)))
+OCAML_RUNTIME_CFLAGS=-DCAML_NAME_SPACE -include caml_runtime_allocator.h
+CFLAGS=${OCAML_CFLAGS} -MD
+
+-include ${OBJ_DIR}/*.d
+
+${OBJ_DIR}/%.o: %.c ${OBJ_DIR}/.exists
+	${CROSS_COMPILER}cc -c ${CFLAGS} $(if $(filter $@, ${OCAML_RUNTIME_OBJS}),${OCAML_RUNTIME_CFLAGS}) $< -o $@
+
+${OBJ_DIR}/test.bin: ${OCAML_RUNTIME_OBJS} ${LIB_OBJS} ${APP_OBJS}
+	${CROSS_COMPILER}cc -o $@  $^ -ldl -lm
+
+test: ${OBJ_DIR}/test.bin
+	file $<
+	${TARGET} $<

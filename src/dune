@@ -1,2 +1,6 @@
 (library
- (name example))
+ (name example)
+ (wrapped false)
+ (foreign_stubs
+  (language c)
+  (names ffi_c ffi_c_caml)))

@@ -1,6 +1,6 @@
 // For format details, see https://aka.ms/devcontainer.json.
 {
-    "name": "ocaml decontainers examples",
+    "name": "ocaml devcontainers C-FFI example",
     "build":  {
         "dockerfile": "Dockerfile",
         "cacheFrom": [
@@ -18,17 +18,25 @@
         "./features/ocaml": {
             "packages": "utop"
         },
+        "./features/apt-packages": {
+            "packages": "file libc6-dev-i386 qemu-user time valgrind"
+        },
+        "./features/musl-cross": {
+            "architectures": "aarch64 arm.eabi i386 x86_64"
+        },
     },
     "customizations": {
         "vscode": {
             "extensions": [
+                "ms-vscode.cpptools",
                 "ocamllabs.ocaml-platform"
             ]
         }
     },
     "remoteUser": "vscode",
     "postCreateCommand": {
-        "opam": "sudo sh -ceux \"chown -R $(id -u):$(id -g) ${OPAMROOT}/log\""
+        "opam": "sudo sh -ceux \"chown -R $(id -u):$(id -g) ${OPAMROOT}/log\"",
+        "submodules": "git submodule update --recursive --init --depth=1"
     },
     "waitFor": "postCreateCommand"
 }

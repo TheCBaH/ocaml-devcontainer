@@ -4,5 +4,10 @@
     "ocaml.sandbox": {
         "kind": "opam",
         "switch": "default"
+    },
+    "files.associations": {
+        "ffi_c.h": "c",
+        "mlvalues.h": "c",
+        "caml_runtime_allocator.h": "c"
     }
 }
