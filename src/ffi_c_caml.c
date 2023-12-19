@@ -151,3 +151,45 @@ CAMLprim value caml_create_bar(value foo)
     Test_val(test) = c_test;
     CAMLreturn (test);
 }
+
+#define TestFoo_tag 1
+#define TestFoo_fields 1
+#define TestFoo_field_0 0
+#define TestBar_tag 0
+#define TestBar_fields 1
+#define TestBar_field_0 0
+
+#define alloc_TestBar() caml_alloc(TestBar_fields, TestBar_tag)
+#define alloc_TestFoo() caml_alloc(TestFoo_fields, TestFoo_tag)
+
+#define Bar_fields 1
+#define Bar_field_a 0
+#define alloc_Bar() caml_alloc(Bar_fields, 0)
+
+CAMLprim value caml_test_to_caml(value test)
+{
+    struct test_union *c_test;
+    CAMLparam1(test);
+    CAMLlocal3(result, caml_a, caml_bar);
+
+    c_test = Test_val(test);
+    switch (c_test->type) {
+    case foo:
+        caml_a = Val_int(c_test->data.foo.a);
+        result = alloc_TestFoo();
+        Store_field(result, TestFoo_field_0, caml_a);
+        break;
+    case bar:
+        assert(c_test->data.bar.foo);
+        caml_a = Val_int(c_test->data.bar.foo->a);
+        caml_bar = alloc_Bar();
+        Store_field(caml_bar, Bar_field_a, caml_a);
+        result = alloc_TestBar();
+        Store_field(result, TestBar_field_0, caml_bar);
+        break;
+    }
+    CAMLreturn (result);
+}
+#if 0
+external to_caml : test -> Test.t = "caml_test_to_caml"
+#endif

@@ -32,7 +32,7 @@ OBJ=obj
 ffi.common:
 	rm -f ${OBJ}/hello.bc ${OBJ}/hello_bc.c
 	mkdir -p ${OBJ}
-	opam exec -- ocamlc -compat-32 -output-obj -o ${OBJ}/hello_bc.c -I src src/hello.ml src/ffi_test.ml main.ml
+	opam exec -- ocamlc -compat-32 -output-obj -o ${OBJ}/hello_bc.c -I src src/hello.ml src/test.ml src/ffi_test.ml main.ml
 
 ffi.prepare:
 	rm -rf cross/${ARCH} obj.${ARCH}
