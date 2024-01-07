@@ -16,7 +16,10 @@
             "upgradePackages": "false"
         },
         "./features/ocaml": {
-            "packages": "utop"
+            "version": "5.1.1",
+            "packages": "utop",
+            "switch": "ocaml-option-static,ocaml-option-no-compression",
+            "system-packages": "musl-dev musl-tools"
         },
     },
     "customizations": {
