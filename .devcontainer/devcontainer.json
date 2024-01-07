@@ -19,7 +19,7 @@
             "version": "5.1.1",
             "packages": "utop",
             "switch": "ocaml-option-static,ocaml-option-no-compression",
-            "system-packages": "musl-dev musl-tools"
+            "system-packages": "musl-dev musl-tools time"
         },
     },
     "customizations": {
