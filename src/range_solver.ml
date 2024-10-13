@@ -20,7 +20,7 @@ let sizes =
   [ (0, 10); (1, 10); (2, 10); (3, 10); (4, 10); (5, 10); (6, 10); (7, 10); (8, 10); (9, 10); (11, 20); (12, 30) ]
   |> List.to_seq |> MapId.of_seq
 
-let groups = [ [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10 ]; [ 1; 3; 4; 5; 6; 7; 8; 9; 10; 11 ]; [ 3; 5; 6; 8; 10; 11; 12 ] ]
+let groups = [ [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10 ]; [ 1; 3; 5; 6; 7; 8; 9; 10; 11 ]; [ 3; 5; 6; 8; 10; 11; 12 ] ]
 
 let dependencies =
   List.fold_left
@@ -44,21 +44,21 @@ module Range = struct
     assert (b < e);
     [ { b; e } ]
 
+  let length_single ~size r =
+    assert (r.e > r.b);
+    assert (r.e >= r.b + size);
+    1 + r.e + -(r.b + size)
+
   let length ~size t =
     List.fold_left
       (fun l r ->
         assert (r.e > r.b);
-        assert (r.e > r.b + size);
-        l + (r.e - (r.b + size)))
+        assert (r.e >= r.b + size);
+        l + length_single ~size r)
       0 t
 
   let to_seq ~size t =
-    let rec seq_ranges l () =
-      match l with
-      | { b; e } :: tl ->
-          assert (e > b + size);
-          seq_range tl b (e - (b + size)) ()
-      | [] -> Seq.Nil
+    let rec seq_ranges l () = match l with r :: tl -> seq_range tl r.b (length_single ~size r) () | [] -> Seq.Nil
     and seq_range l off left () =
       assert (left >= 0);
       let next = if left = 0 then seq_ranges l else seq_range l (succ off) (pred left) in
@@ -72,7 +72,7 @@ module Range = struct
     assert (b' <= e');
     let add size r l =
       assert (r.b <= r.e);
-      if r.b + size < r.e then r :: l else l
+      if r.b + size <= r.e then r :: l else l
     in
     let finalize tl hd = List.rev_append tl hd |> List.rev in
     let rec remove_aux dirty a l =
@@ -104,9 +104,12 @@ let x = Range.remove ~size:10 ~b:90 x
 let x = Range.remove ~size:10 ~b:100 x
 let _ = Range.remove ~size:10 ~b:90 ~e:100 x
 let _ = Range.remove ~size:10 ~b:85 ~e:105 x
-let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:80 ~e:100
+let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:10
+let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:1
+let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70
 let _ = Range.to_seq ~size:10 x |> List.of_seq
 let _ = Range.singleton ~b:30 ~e:100 () |> Range.to_seq ~size:20 |> List.of_seq
+let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70 |> Range.to_seq ~size:10 |> List.of_seq
 
 let base =
   MapId.fold
