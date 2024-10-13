@@ -52,6 +52,20 @@ module Range = struct
         l + (r.e - (r.b + size)))
       0 t
 
+  let to_seq ~size t =
+    let rec seq_ranges l () =
+      match l with
+      | { b; e } :: tl ->
+          assert (e > b + size);
+          seq_range tl b (e - (b + size)) ()
+      | [] -> Seq.Nil
+    and seq_range l off left () =
+      assert (left > 0);
+      let next = if left = 1 then seq_ranges l else seq_range l (succ off) (pred left) in
+      Seq.Cons (off, next)
+    in
+    seq_ranges t
+
   let remove ?e ~b ~size t =
     let e' = Option.value ~default:(succ b) e in
     let b' = b in
@@ -85,11 +99,12 @@ module Range = struct
     remove_aux false [] t
 end
 
-let x = Range.singleton ~b:80 ~e:120 ()
+let x = Range.singleton ~b:70 ~e:120 ()
 let x = Range.remove ~size:10 ~b:90 x
 let x = Range.remove ~size:10 ~b:100 x
 let _ = Range.remove ~size:10 ~b:90 ~e:100 x
 let _ = Range.remove ~size:10 ~b:85 ~e:105 x
+let _ = Range.to_seq ~size:10 x |> List.of_seq
 
 let base =
   MapId.fold
@@ -101,3 +116,33 @@ let base =
     sizes MapPriorityId.empty
 
 let _ = MapPriorityId.min_binding base
+
+let advance ~b ~e ~id base =
+  let deps = MapId.find id dependencies in
+  MapPriorityId.fold
+    (fun pid r next ->
+      if SetId.mem pid.id deps then
+        let size = MapId.find pid.id sizes in
+        let r = Range.remove ~size ~b ~e r in
+        let pid = PriorityId.{ pid with size = Range.length ~size r } in
+        MapPriorityId.add pid r next
+      else MapPriorityId.add pid r next)
+    base MapPriorityId.empty
+
+(*
+let get_best seq base =
+  Seq.fold_left (fun l -> )
+*)
+
+let make_next base =
+  let pid, min = MapPriorityId.min_binding base in
+  let size = MapId.find pid.id sizes in
+  let seq = Range.to_seq ~size min in
+  let b = match seq () with Seq.Cons (b, _) -> b | Seq.Nil -> failwith "seq" in
+  MapPriorityId.remove pid base |> advance ~b ~e:(b + size) ~id:pid.id
+
+let next = make_next base
+let _ = MapPriorityId.min_binding next
+let next = make_next next
+let _ = MapPriorityId.min_binding next
+let _ = MapPriorityId.bindings next
