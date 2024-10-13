@@ -129,10 +129,25 @@ let advance ~b ~e ~id base =
       else MapPriorityId.add pid r next)
     base MapPriorityId.empty
 
-(*
-let get_best seq base =
-  Seq.fold_left (fun l -> )
-*)
+let get_best ~size seq dependencies base =
+  let deps =
+    MapPriorityId.fold (fun pid r deps -> if SetId.mem pid.id dependencies then (pid.id, r) :: deps else deps) base []
+  in
+  let rank ~b ~e =
+    List.fold_left
+      (fun rl (id, r) ->
+        let size = MapId.find id sizes in
+        let r = Range.remove ~size ~b ~e r in
+        let rank = Range.length ~size r in
+        (id, rank) :: rl)
+      [] deps
+  in
+  let rank_sum rl = List.fold_left (fun sum (_, r) -> sum + r) 0 rl in
+  Seq.fold_left
+    (fun l b ->
+      let rank = rank ~b ~e:(b + size) |> rank_sum in
+      (b, rank) :: l)
+    [] seq
 
 let make_next base =
   let pid, min = MapPriorityId.min_binding base in
@@ -140,6 +155,13 @@ let make_next base =
   let seq = Range.to_seq ~size min in
   let b = match seq () with Seq.Cons (b, _) -> b | Seq.Nil -> failwith "seq" in
   MapPriorityId.remove pid base |> advance ~b ~e:(b + size) ~id:pid.id
+
+let _ =
+  let pid, min = MapPriorityId.min_binding base in
+  let size = MapId.find pid.id sizes in
+  let seq = Range.to_seq ~size min in
+  let deps = MapId.find pid.id dependencies in
+  get_best ~size seq deps base
 
 let next = make_next base
 let _ = MapPriorityId.min_binding next
