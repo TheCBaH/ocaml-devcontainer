@@ -111,15 +111,14 @@ let base =
   MapId.fold
     (fun id s m ->
       let b = 0 in
-      let r = Range.singleton ~b ~e:(size + 1) () in
+      let r = Range.singleton ~b ~e:size () in
       let m = MapPriorityId.add PriorityId.{ id; size = Range.length ~size:s r } r m in
       m)
     sizes MapPriorityId.empty
 
 let _ = MapPriorityId.min_binding base
 
-let advance ~b ~e ~id base =
-  let deps = MapId.find id dependencies in
+let advance ~b ~e deps base =
   MapPriorityId.fold
     (fun pid r next ->
       if SetId.mem pid.id deps then
@@ -144,28 +143,34 @@ let get_best ~size seq dependencies base =
       [] deps
   in
   let rank_sum rl = List.fold_left (fun sum (_, r) -> sum + r) 0 rl in
-  Seq.fold_left
-    (fun l b ->
-      let rank = rank ~b ~e:(b + size) |> rank_sum in
-      (b, rank) :: l)
-    [] seq
+  let candidates =
+    Seq.fold_left
+      (fun l b ->
+        let rank = rank ~b ~e:(b + size) |> rank_sum in
+        (b, rank) :: l)
+      [] seq
+  in
+  let candidates = Array.of_list candidates in
+  Array.sort (fun (_, a) (_, b) -> Int.compare b a) candidates;
+  Array.get candidates 0
 
 let make_next base =
   let pid, min = MapPriorityId.min_binding base in
   let size = MapId.find pid.id sizes in
   let seq = Range.to_seq ~size min in
-  let b = match seq () with Seq.Cons (b, _) -> b | Seq.Nil -> failwith "seq" in
-  MapPriorityId.remove pid base |> advance ~b ~e:(b + size) ~id:pid.id
+  let deps = MapId.find pid.id dependencies in
+  let b = get_best ~size seq deps base |> fst in
+  MapPriorityId.remove pid base |> advance ~b ~e:(b + size) deps
 
-let next = base
-
-let _ =
-  let pid, min = MapPriorityId.min_binding next in
+let show_best base =
+  let pid, min = MapPriorityId.min_binding base in
   let size = MapId.find pid.id sizes in
   let seq = Range.to_seq ~size min in
   let deps = MapId.find pid.id dependencies in
-  get_best ~size seq deps next
+  get_best ~size seq deps base
 
+let next = base
+let _ = show_best next
 let next = make_next next
 let _ = MapPriorityId.min_binding next
 let next = make_next next
