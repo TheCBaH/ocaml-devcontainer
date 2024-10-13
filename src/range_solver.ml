@@ -60,8 +60,8 @@ module Range = struct
           seq_range tl b (e - (b + size)) ()
       | [] -> Seq.Nil
     and seq_range l off left () =
-      assert (left > 0);
-      let next = if left = 1 then seq_ranges l else seq_range l (succ off) (pred left) in
+      assert (left >= 0);
+      let next = if left = 0 then seq_ranges l else seq_range l (succ off) (pred left) in
       Seq.Cons (off, next)
     in
     seq_ranges t
@@ -105,7 +105,7 @@ let x = Range.remove ~size:10 ~b:100 x
 let _ = Range.remove ~size:10 ~b:90 ~e:100 x
 let _ = Range.remove ~size:10 ~b:85 ~e:105 x
 let _ = Range.to_seq ~size:10 x |> List.of_seq
-let _ = Range.singleton ~b:30 ~e:101 () |> Range.to_seq ~size:20 |> List.of_seq
+let _ = Range.singleton ~b:30 ~e:100 () |> Range.to_seq ~size:20 |> List.of_seq
 
 let base =
   MapId.fold
