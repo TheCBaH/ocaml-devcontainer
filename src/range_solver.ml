@@ -44,13 +44,21 @@ module Range = struct
     assert (b < e);
     [ { b; e } ]
 
-  let remove ?e ~b t =
+  let length ~size t =
+    List.fold_left
+      (fun l r ->
+        assert (r.e > r.b);
+        assert (r.e > r.b + size);
+        l + (r.e - (r.b + size)))
+      0 t
+
+  let remove ?e ~b ~size t =
     let e' = Option.value ~default:(succ b) e in
     let b' = b in
     assert (b' <= e');
-    let add r l =
+    let add size r l =
       assert (r.b <= r.e);
-      if r.b = r.e then l else r :: l
+      if r.b + size < r.e then r :: l else l
     in
     let finalize tl hd = List.rev_append tl hd |> List.rev in
     let rec remove_aux dirty a l =
@@ -66,21 +74,30 @@ module Range = struct
           else if (* b' .. e | b .. e'  *)
                   b <= b' then
             if e <= e' then (* b--b'+e-e' *)
-              remove_aux true (add { b = b'; e } a) tl
+              remove_aux true (add size { b = b'; e } a) tl
             else (* b++b'.e'+e *)
-              finalize tl (add { b = e'; e } (add { b; e = b' } a))
+              finalize tl (add size { b = e'; e } (add size { b; e = b' } a))
           else if e <= e' then (* b'--b++e-e' *)
             remove_aux true a tl
           else (* b'--b--e'+e *)
-            finalize tl ({ b = e'; e } :: a)
+            finalize tl (add size { b = e'; e } a)
     in
     remove_aux false [] t
 end
 
-let _ = MapPriorityId.find_first
-let _ = SetId.find_first_opt
 let x = Range.singleton ~b:80 ~e:120 ()
-let x = Range.remove ~b:90 x
-let x = Range.remove ~b:100 x
-let _ = Range.remove ~b:90 ~e:100 x
-let _ = Range.remove ~b:85 ~e:105 x
+let x = Range.remove ~size:10 ~b:90 x
+let x = Range.remove ~size:10 ~b:100 x
+let _ = Range.remove ~size:10 ~b:90 ~e:100 x
+let _ = Range.remove ~size:10 ~b:85 ~e:105 x
+
+let base =
+  MapId.fold
+    (fun id s m ->
+      let b = 0 in
+      let r = Range.singleton ~b ~e:size () in
+      let m = MapPriorityId.add PriorityId.{ id; size = Range.length ~size:s r } r m in
+      m)
+    sizes MapPriorityId.empty
+
+let _ = MapPriorityId.min_binding base
