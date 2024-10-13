@@ -87,8 +87,8 @@ module Range = struct
             remove_aux false (hd :: a) tl)
           else if (* b' .. e | b .. e'  *)
                   b <= b' then
-            if e <= e' then (* b--b'+e-e' *)
-              remove_aux true (add size { b = b'; e } a) tl
+            if e <= e' then (* b++b'-e.e' *)
+              remove_aux true (add size { b; e = b' } a) tl
             else (* b++b'.e'+e *)
               finalize tl (add size { b = e'; e } (add size { b; e = b' } a))
           else if e <= e' then (* b'--b++e-e' *)
@@ -104,6 +104,7 @@ let x = Range.remove ~size:10 ~b:90 x
 let x = Range.remove ~size:10 ~b:100 x
 let _ = Range.remove ~size:10 ~b:90 ~e:100 x
 let _ = Range.remove ~size:10 ~b:85 ~e:105 x
+let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:80 ~e:100
 let _ = Range.to_seq ~size:10 x |> List.of_seq
 let _ = Range.singleton ~b:30 ~e:100 () |> Range.to_seq ~size:20 |> List.of_seq
 
@@ -139,10 +140,16 @@ let get_best ~size seq dependencies base =
         let size = MapId.find id sizes in
         let r = Range.remove ~size ~b ~e r in
         let rank = Range.length ~size r in
-        (id, rank) :: rl)
+        (id, rank, r) :: rl)
       [] deps
   in
-  let rank_sum rl = List.fold_left (fun sum (_, r) -> sum + r) 0 rl in
+  let rank_sum rl =
+    List.fold_left
+      (fun (sum, l) r ->
+        let _, rank, _ = r in
+        (sum + rank, r :: l))
+      (0, []) rl
+  in
   let candidates =
     Seq.fold_left
       (fun l b ->
@@ -150,16 +157,17 @@ let get_best ~size seq dependencies base =
         (b, rank) :: l)
       [] seq
   in
-  let candidates = Array.of_list candidates in
-  Array.sort (fun (_, a) (_, b) -> Int.compare b a) candidates;
-  Array.get candidates 0
+  let a_candidates = Array.of_list candidates in
+  Array.sort (fun (_, (a, _)) (_, (b, _)) -> Int.compare b a) a_candidates;
+  Array.to_list a_candidates |> ignore;
+  candidates
 
 let make_next base =
   let pid, min = MapPriorityId.min_binding base in
   let size = MapId.find pid.id sizes in
   let seq = Range.to_seq ~size min in
   let deps = MapId.find pid.id dependencies in
-  let b = get_best ~size seq deps base |> fst in
+  let b = get_best ~size seq deps base |> List.hd |> fst in
   MapPriorityId.remove pid base |> advance ~b ~e:(b + size) deps
 
 let show_best base =
