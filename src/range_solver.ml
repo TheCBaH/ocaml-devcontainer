@@ -39,21 +39,15 @@ module Range = struct
   let length_single ~size r =
     assert (r.e > r.b);
     assert (r.e >= r.b + size);
-    1 + r.e + -(r.b + size)
+    1 + r.e - (r.b + size)
 
-  let length ~size t =
-    List.fold_left
-      (fun l r ->
-        assert (r.e > r.b);
-        assert (r.e >= r.b + size);
-        l + length_single ~size r)
-      0 t
+  let length ~size t = List.fold_left (fun l r -> l + length_single ~size r) 0 t
 
   let to_seq ~size t =
     let rec seq_ranges l () = match l with r :: tl -> seq_range tl r.b (length_single ~size r) () | [] -> Seq.Nil
     and seq_range l off left () =
-      assert (left >= 0);
-      let next = if left = 0 then seq_ranges l else seq_range l (succ off) (pred left) in
+      assert (left >= 1);
+      let next = if left = 1 then seq_ranges l else seq_range l (succ off) (pred left) in
       Seq.Cons (off, next)
     in
     seq_ranges t
@@ -139,7 +133,9 @@ let get_best ~sizes ~size seq dependencies base =
       [] seq
   in
   let a_candidates = Array.of_list candidates in
-  Array.sort (fun (_, (a, _)) (_, (b, _)) -> Int.compare b a) a_candidates;
+  Array.sort
+    (fun (oa, (a, _)) (ob, (b, _)) -> match Int.compare b a with 0 -> Int.compare oa ob | n -> n)
+    a_candidates;
   Array.to_list a_candidates |> ignore;
   candidates
 
@@ -167,6 +163,7 @@ let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:10
 let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:1
 let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70
 let _ = Range.to_seq ~size:10 x |> List.of_seq
+let _ = Range.singleton ~b:0 ~e:10 () |> Range.to_seq ~size:10 |> List.of_seq
 let _ = Range.singleton ~b:30 ~e:100 () |> Range.to_seq ~size:20 |> List.of_seq
 let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70 |> Range.to_seq ~size:10 |> List.of_seq
 let size = 100
@@ -180,6 +177,7 @@ let dependencies = make_dependencies groups
 let base = make_base ~size ~sizes
 let next = base
 let _ = show_best ~dependencies ~sizes next
+let _ = show_best ~dependencies ~sizes next |> List.find (fun (n, _) -> n == 0)
 let next = make_next ~dependencies ~sizes next
 let _ = MapPriorityId.min_binding next
 let next = make_next ~dependencies ~sizes next
