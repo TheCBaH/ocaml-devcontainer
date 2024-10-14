@@ -14,15 +14,7 @@ module MapPriorityId = Map.Make (PriorityId)
 module SetId = Set.Make (Id)
 module MapId = Map.Make (Id)
 
-let size = 100
-
-let sizes =
-  [ (1, 10); (2, 10); (3, 10); (4, 10); (5, 10); (6, 10); (7, 10); (8, 10); (9, 10); (11, 20); (12, 30) ]
-  |> List.to_seq |> MapId.of_seq
-
-let groups = [ [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10 ]; [ 1; 3; 5; 6; 7; 8; 9; 10; 11 ]; [ 3; 5; 6; 8; 10; 11; 12 ] ]
-
-let dependencies =
+let make_dependencies groups =
   List.fold_left
     (fun m l ->
       let s = SetId.of_list l in
@@ -99,19 +91,7 @@ module Range = struct
     remove_aux false [] t
 end
 
-let x = Range.singleton ~b:70 ~e:120 ()
-let x = Range.remove ~size:10 ~b:90 x
-let x = Range.remove ~size:10 ~b:100 x
-let _ = Range.remove ~size:10 ~b:90 ~e:100 x
-let _ = Range.remove ~size:10 ~b:85 ~e:105 x
-let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:10
-let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:1
-let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70
-let _ = Range.to_seq ~size:10 x |> List.of_seq
-let _ = Range.singleton ~b:30 ~e:100 () |> Range.to_seq ~size:20 |> List.of_seq
-let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70 |> Range.to_seq ~size:10 |> List.of_seq
-
-let base =
+let make_base ~size ~sizes =
   MapId.fold
     (fun id s m ->
       let b = 0 in
@@ -120,9 +100,7 @@ let base =
       m)
     sizes MapPriorityId.empty
 
-let _ = MapPriorityId.min_binding base
-
-let advance ~b ~e deps base =
+let advance ~b ~e ~sizes deps base =
   MapPriorityId.fold
     (fun pid r next ->
       if SetId.mem pid.id deps then
@@ -133,7 +111,7 @@ let advance ~b ~e deps base =
       else MapPriorityId.add pid r next)
     base MapPriorityId.empty
 
-let get_best ~size seq dependencies base =
+let get_best ~sizes ~size seq dependencies base =
   let deps =
     MapPriorityId.fold (fun pid r deps -> if SetId.mem pid.id dependencies then (pid.id, r) :: deps else deps) base []
   in
@@ -165,25 +143,45 @@ let get_best ~size seq dependencies base =
   Array.to_list a_candidates |> ignore;
   candidates
 
-let make_next base =
+let make_next ~dependencies ~sizes base =
   let pid, min = MapPriorityId.min_binding base in
   let size = MapId.find pid.id sizes in
   let seq = Range.to_seq ~size min in
   let deps = MapId.find pid.id dependencies in
-  let b = get_best ~size seq deps base |> List.hd |> fst in
-  MapPriorityId.remove pid base |> advance ~b ~e:(b + size) deps
+  let b = get_best ~sizes ~size seq deps base |> List.hd |> fst in
+  MapPriorityId.remove pid base |> advance ~sizes ~b ~e:(b + size) deps
 
-let show_best base =
+let show_best ~dependencies ~sizes base =
   let pid, min = MapPriorityId.min_binding base in
   let size = MapId.find pid.id sizes in
   let seq = Range.to_seq ~size min in
   let deps = MapId.find pid.id dependencies in
-  get_best ~size seq deps base
+  get_best ~sizes ~size seq deps base
 
+let x = Range.singleton ~b:70 ~e:120 ()
+let x = Range.remove ~size:10 ~b:90 x
+let x = Range.remove ~size:10 ~b:100 x
+let _ = Range.remove ~size:10 ~b:90 ~e:100 x
+let _ = Range.remove ~size:10 ~b:85 ~e:105 x
+let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:10
+let _ = Range.singleton ~b:70 ~e:80 () |> Range.length ~size:1
+let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70
+let _ = Range.to_seq ~size:10 x |> List.of_seq
+let _ = Range.singleton ~b:30 ~e:100 () |> Range.to_seq ~size:20 |> List.of_seq
+let _ = Range.singleton ~b:0 ~e:100 () |> Range.remove ~size:10 ~b:10 ~e:70 |> Range.to_seq ~size:10 |> List.of_seq
+let size = 100
+
+let sizes =
+  [ (1, 10); (2, 10); (3, 10); (4, 10); (5, 10); (6, 10); (7, 10); (8, 10); (9, 10); (11, 20); (12, 30) ]
+  |> List.to_seq |> MapId.of_seq
+
+let groups = [ [ 1; 2; 3; 4; 5; 6; 7; 8; 9; 10 ]; [ 1; 3; 5; 6; 7; 8; 9; 10; 11 ]; [ 3; 5; 6; 8; 10; 11; 12 ] ]
+let dependencies = make_dependencies groups
+let base = make_base ~size ~sizes
 let next = base
-let _ = show_best next
-let next = make_next next
+let _ = show_best ~dependencies ~sizes next
+let next = make_next ~dependencies ~sizes next
 let _ = MapPriorityId.min_binding next
-let next = make_next next
+let next = make_next ~dependencies ~sizes next
 let _ = MapPriorityId.min_binding next
 let _ = MapPriorityId.bindings next
