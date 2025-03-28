@@ -4,5 +4,10 @@
     "ocaml.sandbox": {
         "kind": "opam",
         "switch": "default"
-    }
+    },
+    "cSpell.words": [
+        "ocamlformat",
+        "opam",
+        "OPAMROOT"
+    ]
 }
