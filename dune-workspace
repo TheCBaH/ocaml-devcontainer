@@ -1,0 +1,10 @@
+(lang dune 3.0)
+(context (default
+ (name static)
+  (env (_
+  (link_flags  :standard -cclib -static)
+  ))))
+
+(context (default
+ (name shared)
+))
