@@ -31,3 +31,8 @@ jobs:
     - name: utop
       run: |
         echo 'Example.Hello.print ();;' | ${{ env.EXEC }} make utop
+    - name: static
+      run: |
+        ${{ env.EXEC }} make static
+        file _build/default/main.exe
+        _build/default/main.exe
