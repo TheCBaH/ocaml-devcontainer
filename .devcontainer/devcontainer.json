@@ -1,11 +1,8 @@
 // For format details, see https://aka.ms/devcontainer.json.
 {
-    "name": "ocaml decontainers examples",
+    "name": "ocaml devcontainers examples",
     "build":  {
-        "dockerfile": "Dockerfile",
-        "cacheFrom": [
-            "ghcr.io/thecbah/ocaml-devcontainer/devcontainer:master"
-        ]
+        "dockerfile": "Dockerfile"
     },
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {

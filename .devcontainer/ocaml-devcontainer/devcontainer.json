@@ -1,6 +1,6 @@
 // For format details, see https://aka.ms/devcontainer.json.
 {
-    "name": "ocaml decontainer (prebuild)",
+    "name": "ocaml devcontainer (prebuild)",
     "image": "ghcr.io/thecbah/ocaml-devcontainer/devcontainer:master",
     "runArgs": [ "--init" ],
     "customizations": {
