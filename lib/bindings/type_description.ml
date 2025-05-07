@@ -20,6 +20,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let struct_size = field t "struct_size" size_t in
     (struct_size, size, t)
 
+  (* PJRT_Extension_Base contains a type and a pointer to next
+     PJRT_Extension_Base. The framework can go through this chain to find an
+     extension and identify it with the type. *)
   module Extension_Base = struct
     type t
 
@@ -29,15 +32,39 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let () = seal t
   end
 
+  (* ------------------------------- Version ---------------------------------- *)
   module Version = struct
+    (* Incremented when an ABI-incompatible change is made to the interface.
+       Changes include:
+       * Deleting a method or argument
+       * Changing the type of an argument
+       * Rearranging fields in the PJRT_Api or argument structs *)
     let major = constant (_NS "API_MAJOR") int
+
+    (* Incremented when the interface is updated in a way that is potentially
+       ABI-compatible with older versions, if supported by the caller and/or
+       implementation.
+
+       Callers can implement forwards compatibility by using PJRT_Api_Version to
+       check if the implementation is aware of newer interface additions.
+
+       Implementations can implement backwards compatibility by using the
+       `struct_size` fields to detect how many struct fields the caller is aware of.
+
+       Changes include:
+       * Adding a new field to the PJRT_Api or argument structs
+       * Renaming a method or argument (doesn't affect ABI) *)
     let minor = constant (_NS "API_MINOR") int
 
     type t
 
     let struct_size, size, (t : t structure typ) = make_struct "Api_Version"
     let extension_start = field t "extension_start" @@ ptr Extension_Base.t
+
+    (* out *)
     let major_version = field t "major_version" int
+
+    (* out *)
     let minor_version = field t "minor_version" int
     let () = seal t
   end
