@@ -139,6 +139,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
   let namedValue = make_enum "NamedValue" ~suffix:"Type" Types.NamedValue.values
 
+  (* Named value for key-value pairs. *)
   module NamedValue = struct
     type t
 
@@ -151,6 +152,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let int64_array_value = field t "int64_array_value" @@ ptr int64_t
     let float_value = field t "float_value" int64_t
     let bool_value = field t "bool_value" bool
+
+    (* `value_size` is the number of elements for array/string and 1 for scalar
+       values. *)
     let value_size = field t "value_size" size_t
   end
 
