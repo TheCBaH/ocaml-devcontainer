@@ -283,23 +283,25 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let onReadyCallback =
       typedef (static_funptr (api_error @-> ptr void @-> returning void)) @@ ns "Event_OnReadyCallback"
 
-    module OnReady_Args = struct
-      type t
+    module OnReady = struct
+      module Args = struct
+        type t
 
-      let event = t
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_OnReady_Args"
-      let event = field t "event" event
-      let callback = field t "callback_" onReadyCallback
+        let event = t
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_OnReady_Args"
+        let event = field t "event" event
+        let callback = field t "callback_" onReadyCallback
 
-      (* `user_arg` allows `callback` to be called with arbitrary arguments (e.g.
+        (* `user_arg` allows `callback` to be called with arbitrary arguments (e.g.
          via pointers in a struct cast to void* ). *)
-      let user_arg = field t "user_arg" (ptr void)
-      let () = seal t
-    end
+        let user_arg = field t "user_arg" (ptr void)
+        let () = seal t
+      end
 
-    (* Registers `callback` to be called once `event` is ready, with `event`'s
+      (* Registers `callback` to be called once `event` is ready, with `event`'s
        error status and a pointer to an object of the caller's choice as arguments. *)
-    let onReady = typedef (static_funptr (ptr OnReady_Args.t @-> returning api_error)) @@ _NS "Event_OnReady"
+      let api = typedef (static_funptr (ptr Args.t @-> returning api_error)) @@ _NS "Event_OnReady"
+    end
   end
 
   module Api = struct
