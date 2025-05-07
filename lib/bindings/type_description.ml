@@ -10,7 +10,24 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let _NAME v = _NS @@ name ^ "_" ^ v in
     enum ~typedef:true (_NS name) @@ List.map (fun (t, name) -> (t, constant (_NAME name) int64_t)) values
 
-  let extension = make_enum "Extension_Type" Types.Extension_Type.values
+  (* ------------------------------- Extensions ---------------------------------- *)
+  let extension_type = make_enum "Extension_Type" Types.Extension_Type.values
+
+  let make_struct name =
+    let name = _NS name in
+    let t = structure name in
+    let size = constant (name ^ "_STRUCT_SIZE") size_t in
+    (size, t)
+
+  module Extension_Base = struct
+    type t
+
+    let size, (t : t structure typ) = make_struct "Extension_Base"
+    let struct_size = field t "struct_size" size_t
+    let type_ = field t "type" extension_type
+    let next = field t "next" @@ ptr t
+    let () = seal t
+  end
 
   module Api = struct
     type t
@@ -22,7 +39,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
   let init = typedef (static_funptr (void @-> returning Api.t)) @@ ns "init"
 
   module Dl = struct
-    let t : [ `pjrt_t ] structure typ = structure (ns "t")
+    type t
+
+    let t : t structure typ = structure (ns "t")
     let handle = field t "handle" (ptr void)
     let init = field t "init" init
     let () = seal t
