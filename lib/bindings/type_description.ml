@@ -13,6 +13,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
   (* ------------------------------- Extensions ---------------------------------- *)
   let extension_type = make_enum "Extension_Type" Types.Extension_Type.values
 
+  (* Codes are based on https://abseil.io/docs/cpp/guides/status-codes *)
+  let error_code = make_enum "Error_Code" Types.Error_Code.values
+
   let make_struct name =
     let name = _NS name in
     let t = structure name in
@@ -111,6 +114,17 @@ module Types (F : Cstubs.Types.TYPE) = struct
     (* Gets the human-readable reason for `error`. `message` has the lifetime of
        `error`. *)
     let message = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ ns "Error_Message"
+
+    module GetCode_Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_GetCode_Args"
+      let error = field t "error" const_error
+
+      (* out *)
+      let code = field t "code" error_code
+      let () = seal t
+    end
   end
 
   module Api = struct
