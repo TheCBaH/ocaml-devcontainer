@@ -6,6 +6,12 @@ module Types (F : Cstubs.Types.TYPE) = struct
   let ns name = "pjrt_" ^ name
   let _NS name = "PJRT_" ^ name
 
+  let make_enum name values =
+    let _NAME v = _NS @@ name ^ "_" ^ v in
+    enum ~typedef:true (_NS name) @@ List.map (fun (t, name) -> (t, constant (_NAME name) int64_t)) values
+
+  let extension = make_enum "Extension_Type" Types.Extension_Type.values
+
   module Api = struct
     type t
 
