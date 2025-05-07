@@ -13,15 +13,15 @@
             "upgradePackages": "false"
         },
         "./features/ocaml": {
-            "packages": "utop",
-            "options": "ocaml-option-static",
-            "system-packages": "musl-dev musl-tools"
+            "packages": "utop ctypes ctypes-foreign ppx_expect"
         },
     },
     "customizations": {
         "vscode": {
             "extensions": [
-                "ocamllabs.ocaml-platform"
+                "ms-vscode.cpptools",
+                "ocamllabs.ocaml-platform",
+                "streetsidesoftware.code-spell-checker"
             ]
         }
     },

@@ -1,6 +1,7 @@
-ARG VARIANT=12
-FROM debian:${VARIANT}
+ARG VARIANT=24.04
+FROM ubuntu:${VARIANT}
 RUN set -eux;\
+    if id -u ubuntu ; then userdel -r ubuntu; fi;\
     apt-get update;\
     env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends\
   ca-certificates\

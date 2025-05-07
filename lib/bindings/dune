@@ -1,0 +1,28 @@
+(data_only_dirs pjrt pjrt_lib)
+
+(rule
+ (deps Makefile pjrt.h pjrt.c pjrt/pjrt_c_api.h)
+ (targets pjrt_c_api.h libpjrt.a dllpjrt.so)
+ (action
+  (no-infer
+   (progn
+    (run make)
+    (copy pjrt/pjrt_c_api.h pjrt_c_api.h)))))
+
+(library
+ (name pjrt)
+ (foreign_archives pjrt)
+ (ctypes
+  (external_library_name libpjrt)
+  (build_flags_resolver (vendored))
+  (headers
+   (preamble "#include \"pjrt.h\""))
+  (type_description
+   (instance Types)
+   (functor Type_description))
+  (function_description
+   (concurrency unlocked)
+   (instance Functions)
+   (functor Function_description))
+  (generated_types Types_generated)
+  (generated_entry_point C)))

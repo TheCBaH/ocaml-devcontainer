@@ -6,9 +6,21 @@
         "switch": "default"
     },
     "cSpell.words": [
+        "cpptools",
+        "ctypes",
+        "dllpjrt",
+        "dlopen",
+        "fpic",
+        "funptr",
+        "libpjrt",
         "ocamlformat",
+        "ocamllabs",
+        "ocamlopt",
         "opam",
         "OPAMROOT",
+        "pjrt",
+        "progn",
+        "toplevel",
         "utop"
     ]
 }
