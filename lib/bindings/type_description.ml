@@ -1,10 +1,8 @@
 open Ctypes
+open Type_description_base
 
 module Types (F : Cstubs.Types.TYPE) = struct
   open F
-
-  let ns name = "pjrt_" ^ name
-  let _NS name = "PJRT_" ^ name
 
   let make_enum ?suffix name values =
     let _NAME v = _NS @@ name ^ "_" ^ v in

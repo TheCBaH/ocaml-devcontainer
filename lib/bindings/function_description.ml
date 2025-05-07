@@ -1,4 +1,5 @@
 open Ctypes
+open Type_description_base
 module Types = Types_generated (* Module containing types generated from gpt2_type_description.ml *)
 
 module Functions (F : Ctypes.FOREIGN) = struct
