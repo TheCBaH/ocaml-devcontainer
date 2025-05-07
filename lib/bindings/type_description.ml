@@ -74,6 +74,10 @@ module Types (F : Cstubs.Types.TYPE) = struct
   end
 
   (*// ---------------------------------- Errors ----------------------------------- *)
+  (* PJRT C API methods generally return a PJRT_Error*, which is nullptr if there
+     is no error and set if there is. The implementation allocates any returned
+     PJRT_Errors, but the caller is always responsible for freeing them via
+     PJRT_Error_Destroy. *)
   module Error = struct
     type t
 
@@ -89,6 +93,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let () = seal t
     end
 
+    (* Frees `error`. `error` can be nullptr. *)
     let destroy = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ _NS "Error_Destroy"
 
     module Message_Args = struct
@@ -96,11 +101,15 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Message_Args"
       let error = field t "error" const_error
+
+      (* Has the lifetime of `error`. *)
       let message = field t "message" string
       let message_size = field t "message_size" size_t
       let () = seal t
     end
 
+    (* Gets the human-readable reason for `error`. `message` has the lifetime of
+       `error`. *)
     let message = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ ns "Error_Message"
   end
 
