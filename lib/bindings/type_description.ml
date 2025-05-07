@@ -18,7 +18,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let t = structure name in
     let size = constant (name ^ "_STRUCT_SIZE") size_t in
     let struct_size = field t "struct_size" size_t in
-    (struct_size, size, t)
+    (struct_size, size, typedef t name)
 
   (* PJRT_Extension_Base contains a type and a pointer to next
      PJRT_Extension_Base. The framework can go through this chain to find an
@@ -73,9 +73,10 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let () = seal t
   end
 
-  type t
-
+  (*// ---------------------------------- Errors ----------------------------------- *)
   module Error = struct
+    type t
+
     let _struct : t structure typ = F.structure @@ _NS "Error"
     let error = ptr @@ typedef _struct @@ ns "Error"
     let const_error = ptr @@ const @@ typedef _struct @@ ns "Error"
@@ -88,7 +89,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let () = seal t
     end
 
-    let destroy = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ ns "init"
+    let destroy = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ _NS "Error_Destroy"
 
     module Message_Args = struct
       type t
@@ -99,6 +100,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let message_size = field t "message_size" size_t
       let () = seal t
     end
+
+    let message = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ ns "Error_Message"
   end
 
   module Api = struct
