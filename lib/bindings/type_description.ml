@@ -125,6 +125,16 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let code = field t "code" error_code
       let () = seal t
     end
+
+    let getCode = typedef (static_funptr (ptr GetCode_Args.t @-> returning error)) @@ _NS "Error_GetCode"
+
+    (* Function for PJRT implementation to pass to callback functions provided by
+       caller so the callback can create a PJRT_Error* on error (to return to the
+       implementation). `message` is only required to live for the
+       PJRT_CallbackError call, i.e. the PJRT_CallbackError implementation must copy
+       `message` into the PJRT_Error. *)
+    let callback_error =
+      typedef (static_funptr (error_code @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
   end
 
   module Api = struct
