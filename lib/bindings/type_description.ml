@@ -143,6 +143,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let callback_error = typedef (static_funptr (code @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
   end
 
+  let api_error = Error.error
   let namedValue = make_enum "NamedValue" ~suffix:"Type" Types.NamedValue.values
 
   (* Named value for key-value pairs. *)
@@ -211,39 +212,44 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let _struct : t structure typ = F.structure @@ _NS "Event"
     let t = ptr @@ typedef _struct @@ ns "Event"
 
-    module Destroy_Args = struct
-      type t
+    module Destroy = struct
+      module Args = struct
+        type t
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_Destroy_Args"
-      let event = field t "event" t
-      let () = seal t
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_Destroy_Args"
+        let event = field t "event" t
+        let () = seal t
+      end
+
+      (* Frees `event`. `event` can be `nullptr`. *)
+      let api = typedef (static_funptr (ptr Args.t @-> returning Error.error)) @@ _NS "Event_Destroy"
     end
 
-    (* Frees `event`. `event` can be `nullptr`. *)
-    let destroy = typedef (static_funptr (ptr Destroy_Args.t @-> returning Error.error)) @@ _NS "Event_Destroy"
+    module IsReady = struct
+      module Args = struct
+        type t
 
-    module IsReady_Args = struct
-      type t
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_IsReady_Args"
+        let event = field t "event" t
+        let is_ready = field t "is_ready" bool (* out *)
+        let () = seal t
+      end
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_IsReady_Args"
-      let event = field t "event" t
-      let is_ready = field t "is_ready" bool (* out *)
-      let () = seal t
-    end
-
-    (* Returns true if this PJRT_Event has completed, including if an error has
+      (* Returns true if this PJRT_Event has completed, including if an error has
        occurred. *)
-    let isReady = typedef (static_funptr (ptr IsReady_Args.t @-> returning Error.error)) @@ _NS "Event_IsReady"
-
-    module Error_Args = struct
-      type t
-
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_Error_Args"
-      let event = field t "event" t
-      let () = seal t
+      let api = typedef (static_funptr (ptr Args.t @-> returning Error.error)) @@ _NS "Event_IsReady"
     end
 
-    (* Should only be called if PJRT_Event_IsReady returns true.
+    module Error = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_Error_Args"
+        let event = field t "event" t
+        let () = seal t
+      end
+
+      (* Should only be called if PJRT_Event_IsReady returns true.
        Returns `nullptr` if there is no error.
        The returned error should be freed with `PJRT_Error_Destroy`.
 
@@ -252,27 +258,30 @@ module Types (F : Cstubs.Types.TYPE) = struct
        `PJRT_Event_Error`. However, each of these `PJRT_Error *` pointers are
        independent of `PJRT_Error *`s returned by other function calls, so they must
        each be freed separately using `PJRT_Error_Destroy`. *)
-    let error = typedef (static_funptr (ptr Error_Args.t @-> returning Error.error)) @@ _NS "Event_Error"
-
-    module Await_Args = struct
-      type t
-
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_Await_Args"
-      let event = field t "event" t
-      let () = seal t
+      let api = typedef (static_funptr (ptr Args.t @-> returning Error.error)) @@ _NS "Event_Error"
     end
 
-    (* Blocks the calling thread until `event` is ready, then returns the error
+    module Await = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_Await_Args"
+        let event = field t "event" t
+        let () = seal t
+      end
+
+      (* Blocks the calling thread until `event` is ready, then returns the error
        status (with `nullptr` indicating no error). The returned status should be
        freed with `PJRT_Error_Destroy`. *)
-    let await = typedef (static_funptr (ptr Await_Args.t @-> returning Error.error)) @@ _NS "Event_Await"
+      let api = typedef (static_funptr (ptr Args.t @-> returning api_error)) @@ _NS "Event_Await"
+    end
 
     (* A callback to be performed once an event is ready. It will be called on the
        event's error state and a pointer to an object of the caller's choice.
        Ownership of `error` is passed to the callback. The callback must destroy
        `error` via `PJRT_Error_Destroy`. The caller retains ownership of `user_arg`. *)
     let onReadyCallback =
-      typedef (static_funptr (Error.error @-> ptr void @-> returning void)) @@ ns "Event_OnReadyCallback"
+      typedef (static_funptr (api_error @-> ptr void @-> returning void)) @@ ns "Event_OnReadyCallback"
 
     module OnReady_Args = struct
       type t
@@ -290,7 +299,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     (* Registers `callback` to be called once `event` is ready, with `event`'s
        error status and a pointer to an object of the caller's choice as arguments. *)
-    let onReady = typedef (static_funptr (ptr OnReady_Args.t @-> returning Error.error)) @@ _NS "Event_OnReady"
+    let onReady = typedef (static_funptr (ptr OnReady_Args.t @-> returning api_error)) @@ _NS "Event_OnReady"
   end
 
   module Api = struct
