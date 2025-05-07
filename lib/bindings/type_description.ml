@@ -17,15 +17,28 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let name = _NS name in
     let t = structure name in
     let size = constant (name ^ "_STRUCT_SIZE") size_t in
-    (size, t)
+    let struct_size = field t "struct_size" size_t in
+    (struct_size, size, t)
 
   module Extension_Base = struct
     type t
 
-    let size, (t : t structure typ) = make_struct "Extension_Base"
-    let struct_size = field t "struct_size" size_t
+    let struct_size, size, (t : t structure typ) = make_struct "Extension_Base"
     let type_ = field t "type" extension_type
     let next = field t "next" @@ ptr t
+    let () = seal t
+  end
+
+  module Version = struct
+    let major = constant (_NS "API_MAJOR") int
+    let minor = constant (_NS "API_MINOR") int
+
+    type t
+
+    let struct_size, size, (t : t structure typ) = make_struct "Api_Version"
+    let extension_start = field t "extension_start" @@ ptr Extension_Base.t
+    let major_version = field t "major_version" int
+    let minor_version = field t "minor_version" int
     let () = seal t
   end
 
