@@ -6,15 +6,13 @@ module Types (F : Cstubs.Types.TYPE) = struct
   let ns name = "pjrt_" ^ name
   let _NS name = "PJRT_" ^ name
 
-  let make_enum name values =
+  let make_enum ?suffix name values =
     let _NAME v = _NS @@ name ^ "_" ^ v in
-    enum ~typedef:true (_NS name) @@ List.map (fun (t, name) -> (t, constant (_NAME name) int64_t)) values
+    let typedef_name = match suffix with None -> name | Some suffix -> name ^ "_" ^ suffix in
+    enum ~typedef:true (_NS typedef_name) @@ List.map (fun (t, name) -> (t, constant (_NAME name) int64_t)) values
 
   (* ------------------------------- Extensions ---------------------------------- *)
   let extension_type = make_enum "Extension_Type" Types.Extension_Type.values
-
-  (* Codes are based on https://abseil.io/docs/cpp/guides/status-codes *)
-  let error_code = make_enum "Error_Code" Types.Error_Code.values
 
   let make_struct name =
     let name = _NS name in
@@ -115,6 +113,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
        `error`. *)
     let message = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ ns "Error_Message"
 
+    (* Codes are based on https://abseil.io/docs/cpp/guides/status-codes *)
+    let code = make_enum "Error_Code" Types.Error_Code.values
+
     module GetCode_Args = struct
       type t
 
@@ -122,7 +123,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let error = field t "error" const_error
 
       (* out *)
-      let code = field t "code" error_code
+      let code = field t "code" code
       let () = seal t
     end
 
@@ -133,8 +134,24 @@ module Types (F : Cstubs.Types.TYPE) = struct
        implementation). `message` is only required to live for the
        PJRT_CallbackError call, i.e. the PJRT_CallbackError implementation must copy
        `message` into the PJRT_Error. *)
-    let callback_error =
-      typedef (static_funptr (error_code @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
+    let callback_error = typedef (static_funptr (code @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
+  end
+
+  let namedValue = make_enum "NamedValue" ~suffix:"Type" Types.NamedValue.values
+
+  module NamedValue = struct
+    type t
+
+    let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "NamedValue"
+    let name = field t "name" string
+    let name_size = field t "name_size" size_t
+    let type_ = field t "type" namedValue
+    let string_value = field t "string_value" string
+    let int64_value = field t "int64_value" int64_t
+    let int64_array_value = field t "int64_array_value" @@ ptr int64_t
+    let float_value = field t "float_value" int64_t
+    let bool_value = field t "bool_value" bool
+    let value_size = field t "value_size" size_t
   end
 
   module Api = struct

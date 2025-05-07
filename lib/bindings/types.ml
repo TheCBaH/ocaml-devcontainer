@@ -64,3 +64,9 @@ module Error_Code = struct
       (UNAUTHENTICATED, "UNAUTHENTICATED");
     ]
 end
+
+module NamedValue = struct
+  type t = String | Int64 | Int64List | Float | Bool
+
+  let values = [ (String, "kString"); (Int64, "kInt64"); (Int64List, "kInt64List"); (Float, "kFloat"); (Bool, "kBool") ]
+end
