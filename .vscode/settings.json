@@ -20,6 +20,7 @@
         "OPAMROOT",
         "pjrt",
         "progn",
+        "stablehlo",
         "toplevel",
         "utop"
     ]

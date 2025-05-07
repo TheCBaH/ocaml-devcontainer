@@ -137,8 +137,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let callback_error = typedef (static_funptr (code @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
   end
 
-  let namedValue = make_enum "NamedValue" ~suffix:"Type" Types.NamedValue.values
-
   (* Named value for key-value pairs. *)
   module NamedValue = struct
     type t
@@ -156,6 +154,37 @@ module Types (F : Cstubs.Types.TYPE) = struct
     (* `value_size` is the number of elements for array/string and 1 for scalar
        values. *)
     let value_size = field t "value_size" size_t
+  end
+
+  (* ---------------------------------- Plugin ----------------------------------- *)
+  module Plugin = struct
+    module Initialize_Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Plugin_Initialize_Args"
+      let () = seal t
+    end
+
+    (* One-time plugin setup. Must be called before any other functions are called. *)
+    let initialize =
+      typedef (static_funptr (ptr Initialize_Args.t @-> returning Error.error)) @@ _NS "Plugin_Initialize"
+
+    module Attributes_Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Plugin_Attributes_Args"
+
+      (* Returned attributes have the lifetime of the process. *)
+      let attributes = field t "attributes" @@ ptr @@ const NamedValue.t (* out *)
+      let num_attributes = field t "num_attributes" size_t (* out *)
+      let () = seal t
+    end
+
+    (* Returns an array of plugin attributes which are key-value pairs. Common keys
+       include `xla_version`, `stablehlo_current_version`, and
+       `stablehlo_minimum_version`. *)
+    let attributes =
+      typedef (static_funptr (ptr Attributes_Args.t @-> returning Error.error)) @@ _NS "Plugin_Attributes"
   end
 
   module Api = struct
