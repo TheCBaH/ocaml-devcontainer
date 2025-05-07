@@ -1,9 +1,14 @@
-all: lib
+all: lib copy
 
 CFLAGS=-W -Wall -fpic -FPIC -I pjrt
 
 lib: libpjrt.a
 	touch dllpjrt.so
+
+copy:
+	cp -p pjrt/pjrt_c_api.h pjrt_c_api.h.tmp
+	sed -ie 's/ callback;/ callback_;/' pjrt_c_api.h.tmp
+	mv pjrt_c_api.h.tmp pjrt_c_api.h
 
 libpjrt.a: pjrt.c pjrt.h
 	${CC} ${CFLAGS} -c pjrt.c -o pjrt.o

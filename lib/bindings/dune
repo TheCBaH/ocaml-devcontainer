@@ -6,8 +6,7 @@
  (action
   (no-infer
    (progn
-    (run make)
-    (copy pjrt/pjrt_c_api.h pjrt_c_api.h)))))
+    (run make)))))
 
 (library
  (name pjrt)
