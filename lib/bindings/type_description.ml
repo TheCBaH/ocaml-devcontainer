@@ -86,48 +86,54 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let error = ptr @@ typedef _struct @@ ns "Error"
     let const_error = ptr @@ const @@ typedef _struct @@ ns "Error"
 
-    module Destroy_Args = struct
-      type t
+    module Destroy = struct
+      module Args = struct
+        type t
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Destroy_Args"
-      let error = field t "error" error
-      let () = seal t
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Destroy_Args"
+        let error = field t "error" error
+        let () = seal t
+      end
+
+      (* Frees `error`. `error` can be nullptr. *)
+      let api = typedef (static_funptr (void @-> returning @@ ptr Args.t)) @@ _NS "Error_Destroy"
     end
 
-    (* Frees `error`. `error` can be nullptr. *)
-    let destroy = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ _NS "Error_Destroy"
+    module Message = struct
+      module Args = struct
+        type t
 
-    module Message_Args = struct
-      type t
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Message_Args"
+        let error = field t "error" const_error
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Message_Args"
-      let error = field t "error" const_error
+        (* Has the lifetime of `error`. *)
+        let message = field t "message" string
+        let message_size = field t "message_size" size_t
+        let () = seal t
+      end
 
-      (* Has the lifetime of `error`. *)
-      let message = field t "message" string
-      let message_size = field t "message_size" size_t
-      let () = seal t
-    end
-
-    (* Gets the human-readable reason for `error`. `message` has the lifetime of
+      (* Gets the human-readable reason for `error`. `message` has the lifetime of
        `error`. *)
-    let message = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ ns "Error_Message"
+      let api = typedef (static_funptr (void @-> returning @@ ptr Destroy.Args.t)) @@ ns "Error_Message"
+    end
 
     (* Codes are based on https://abseil.io/docs/cpp/guides/status-codes *)
     let code = make_enum "Error_Code" Types.Error_Code.values
 
-    module GetCode_Args = struct
-      type t
+    module GetCode = struct
+      module Args = struct
+        type t
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_GetCode_Args"
-      let error = field t "error" const_error
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_GetCode_Args"
+        let error = field t "error" const_error
 
-      (* out *)
-      let code = field t "code" code
-      let () = seal t
+        (* out *)
+        let code = field t "code" code
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Error_GetCode"
     end
-
-    let getCode = typedef (static_funptr (ptr GetCode_Args.t @-> returning error)) @@ _NS "Error_GetCode"
 
     (* Function for PJRT implementation to pass to callback functions provided by
        caller so the callback can create a PJRT_Error* on error (to return to the
@@ -160,33 +166,35 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
   (* ---------------------------------- Plugin ----------------------------------- *)
   module Plugin = struct
-    module Initialize_Args = struct
-      type t
+    module Initialize = struct
+      module Args = struct
+        type t
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Plugin_Initialize_Args"
-      let () = seal t
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Plugin_Initialize_Args"
+        let () = seal t
+      end
+
+      (* One-time plugin setup. Must be called before any other functions are called. *)
+      let api = typedef (static_funptr (ptr Args.t @-> returning Error.error)) @@ _NS "Plugin_Initialize"
     end
 
-    (* One-time plugin setup. Must be called before any other functions are called. *)
-    let initialize =
-      typedef (static_funptr (ptr Initialize_Args.t @-> returning Error.error)) @@ _NS "Plugin_Initialize"
+    module Attributes = struct
+      module Args = struct
+        type t
 
-    module Attributes_Args = struct
-      type t
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Plugin_Attributes_Args"
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Plugin_Attributes_Args"
+        (* Returned attributes have the lifetime of the process. *)
+        let attributes = field t "attributes" @@ ptr @@ const NamedValue.t (* out *)
+        let num_attributes = field t "num_attributes" size_t (* out *)
+        let () = seal t
+      end
 
-      (* Returned attributes have the lifetime of the process. *)
-      let attributes = field t "attributes" @@ ptr @@ const NamedValue.t (* out *)
-      let num_attributes = field t "num_attributes" size_t (* out *)
-      let () = seal t
-    end
-
-    (* Returns an array of plugin attributes which are key-value pairs. Common keys
+      (* Returns an array of plugin attributes which are key-value pairs. Common keys
        include `xla_version`, `stablehlo_current_version`, and
        `stablehlo_minimum_version`. *)
-    let attributes =
-      typedef (static_funptr (ptr Attributes_Args.t @-> returning Error.error)) @@ _NS "Plugin_Attributes"
+      let api = typedef (static_funptr (ptr Args.t @-> returning Error.error)) @@ _NS "Plugin_Attributes"
+    end
   end
 
   (* ---------------------------------- Events ----------------------------------- *)
