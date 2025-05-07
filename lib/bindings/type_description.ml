@@ -32,6 +32,11 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let () = seal t
   end
 
+  let pjrt_struct name =
+    let struct_size, size, t = make_struct name in
+    let extension_start = field t "extension_start" @@ ptr Extension_Base.t in
+    (extension_start, struct_size, size, t)
+
   (* ------------------------------- Version ---------------------------------- *)
   module Version = struct
     (* Incremented when an ABI-incompatible change is made to the interface.
@@ -58,8 +63,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     type t
 
-    let struct_size, size, (t : t structure typ) = make_struct "Api_Version"
-    let extension_start = field t "extension_start" @@ ptr Extension_Base.t
+    let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Api_Version"
 
     (* out *)
     let major_version = field t "major_version" int
@@ -67,6 +71,34 @@ module Types (F : Cstubs.Types.TYPE) = struct
     (* out *)
     let minor_version = field t "minor_version" int
     let () = seal t
+  end
+
+  type t
+
+  module Error = struct
+    let _struct : t structure typ = F.structure @@ _NS "Error"
+    let error = ptr @@ typedef _struct @@ ns "Error"
+    let const_error = ptr @@ const @@ typedef _struct @@ ns "Error"
+
+    module Destroy_Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Destroy_Args"
+      let error = field t "error" error
+      let () = seal t
+    end
+
+    let destroy = typedef (static_funptr (void @-> returning @@ ptr Destroy_Args.t)) @@ ns "init"
+
+    module Message_Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Message_Args"
+      let error = field t "error" const_error
+      let message = field t "message" string
+      let message_size = field t "message_size" size_t
+      let () = seal t
+    end
   end
 
   module Api = struct
