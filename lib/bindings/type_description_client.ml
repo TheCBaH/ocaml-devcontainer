@@ -435,23 +435,118 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_BufferFromHostBuffer_Args"
       let client = field t "client" @@ ptr client
+
+      (* Pointer to the host buffer *)
       let data = field t "data" @@ ptr void
+
+      (* The type of the `data`, and the type of the resulting output `buffer` *)
       let type_ = field t "type" bufferType
+
+      (* The array dimensions of `data`. *)
       let dims = field t "dims" @@ ptr int64_t
       let num_dims = field t "num_dims" size_t
+
+      (* Number of bytes to traverse per dimension of the input data. Must be the
+         same size as `dims`, or empty. If empty, the array is assumed to have a
+         dense layout with dimensions in major-to-minor order
+         Caution: `byte_strides` are allowed to be negative, in which case `data`
+         may need to point to the interior of the buffer, not necessarily its start. *)
       let byte_strides = field t "byte_strides" @@ ptr int64_t
       let num_byte_strides = field t "num_byte_strides" size_t
       let host_buffer_semantics = field t "host_buffer_semantics" hostBufferSemantics
 
-      (* `device` and `memory_layout` are owned by the caller. *)
+      (* Device to copy host data to. *)
       let device = field t "device" @@ ptr device
+
+      (* If nullptr, host data will be copied to `device`, otherwise we copy data to
+         `memory`. *)
       let memory = field t "memory" @@ ptr memory (* optional *)
+
+      (* The caller is responsible to keep the data (tiled or strides) in the
+         device_layout alive during the call. If nullptr, the device layout is
+         assumed to be a dense layout with dimensions in major-to-minor order. *)
       let device_layout = field t "device_layout" @@ ptr bufferMemoryLayout
+
+      (* Event indicating when it's safe to free `data`. The caller is responsible
+         for calling PJRT_Event_Destroy. *)
       let done_with_host_buffer = field t "done_with_host_buffer" @@ ptr event (* out *)
+
+      (* Output device buffer. The caller is responsible for calling
+         PJRT_Buffer_Destroy. *)
       let buffer = field t "buffer" @@ ptr buffer (* out *)
       let () = seal t
     end
 
+    (* Asynchronously copies a buffer stored on host to device memory. *)
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_BufferFromHostBuffer"
+  end
+
+  module Client_CreateViewOfDeviceBuffer = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_CreateViewOfDeviceBuffer_Args"
+      let client = field t "client" @@ ptr client
+
+      (* A pointer to a non-owned device buffer. A PJRT_Buffer that is a non-owned
+         view of this device buffer will be created. *)
+      let device_buffer_ptr = field t "device_buffer_ptr" @@ ptr void
+      let dims = field t "dims" @@ ptr int64_t
+      let num_dims = field t "num_dims" size_t
+      let element_type = field t "element_type" bufferType
+      let layout = field t "layout" @@ ptr bufferMemoryLayout
+
+      (* The device that `device_buffer_ptr` is on. The argument is ignored if
+         `memory` is provided.
+         DEPRECATED: Use `memory` instead. *)
+      let device = field t "device" @@ ptr device
+
+      (* A callback to be performed when the PJRT_Buffer is done with the on-device
+         buffer. This callback is optional and can be a nullptr. *)
+      let on_delete_callback = field t "on_delete_callback" @@ static_funptr (ptr void @-> ptr void @-> returning void)
+
+      (* `on_delete_callback_arg` will be passed to `on_delete_callback` as
+         `user_arg` argument. *)
+      let on_delete_callback_arg = field t "on_delete_callback_arg" @@ ptr void
+
+      (* A platform-specific stream handle that should contain the work or events
+         needed to materialize the on-device buffer. It is optional and can be
+         casted from a nullptr. PJRT_Client_CreateViewOfDeviceBuffer_Args will
+         append an event to `stream` that indicates when the returned buffer is
+         ready to use. This is intended to support dlpack on GPU and is not expected
+         to be supported on all hardware platforms. *)
+      let stream = field t "stream" intptr_t
+      let buffer = field t "buffer" @@ ptr buffer (* out *)
+
+      (* The memory space that `device_buffer_ptr` is in. *)
+      let memory = field t "memory" @@ ptr memory
+      let () = seal t
+    end
+
+    (* Creates a PJRT buffer that is a non-owned view of an on-device buffer
+       (typically allocated by another library). The buffer may be mutated,
+       for example, if the buffer is donated to an Execute operation. This method is
+       not required on all hardware platforms. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_CreateViewOfDeviceBuffer"
+  end
+
+  module Client_CreateBuffersForAsyncHostToDevice = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) =
+        pjrt_struct "Client_CreateBuffersForAsyncHostToDevice_Args"
+
+      let client = field t "client" @@ ptr client
+      let shape_specs = field t "shape_specs" @@ ptr shapeSpec
+      let num_shape_specs = field t "num_shape_specs" size_t
+      let device_layouts = field t "device_layouts" @@ ptr (ptr bufferMemoryLayout) (* optional *)
+      let num_device_layouts = field t "num_device_layouts" size_t
+      let memory = field t "memory" @@ ptr memory
+      let transfer_manager = field t "transfer_manager" @@ ptr asyncHostToDeviceTransferManager (* out *)
+      let () = seal t
+    end
+
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_CreateBuffersForAsyncHostToDevice"
   end
 end
