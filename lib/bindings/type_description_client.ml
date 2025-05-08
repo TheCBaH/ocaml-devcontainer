@@ -18,6 +18,63 @@ module Types (F : Cstubs.Types.TYPE) = struct
   let asyncHostToDeviceTransferManager : [ `AsyncHostToDeviceTransferManager ] structure typ =
     snd @@ make_struct_base "AsyncHostToDeviceTransferManager"
 
+  let buffer_memory_layout_tiled : [ `Buffer_MemoryLayout_Tiled ] structure typ =
+    snd @@ make_struct_base "Buffer_MemoryLayout_Tiled"
+
+  (* A map from physical dimension numbers to logical dimension numbers.
+     The first element is the most minor physical dimension (fastest varying
+     index) and the last the most major (slowest varying index). The contents of
+     the vector are the indices of the *logical* dimensions in the shape. Must
+     be the same size as the number of dimensions of the buffer. *)
+  module Buffer_MemoryLayout_Tiled = struct
+    type t = [ `Buffer_MemoryLayout_Tiled ]
+
+    let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_MemoryLayout_Tiled"
+    let minor_to_major = field t "minor_to_major" @@ ptr int64_t
+    let minor_to_major_size = field t "minor_to_major_size" size_t
+
+    (* A concatenated list of tile dimensions. *)
+    let tile_dims = field t "tile_dims" @@ ptr int64_t
+
+    (* The list of tile dimension sizes. The size of this list is `num_tiles`. *)
+    let tile_dim_sizes = field t "tile_dim_sizes" @@ ptr size_t
+    let num_tiles = field t "num_tiles" size_t
+    let () = seal t
+  end
+
+  let buffer_memory_layout_strides : [ `Buffer_MemoryLayout_Strides ] structure typ =
+    snd @@ make_struct_base "Buffer_MemoryLayout_Strides"
+
+  module Buffer_MemoryLayout_Strides = struct
+    type t = [ `Buffer_MemoryLayout_Strides ]
+
+    let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_MemoryLayout_Strides"
+
+    (* Number of bytes to traverse per dimension. Must be the same size as
+       the number of dimensions of the data. Caution: `byte_strides` are allowed
+       to be negative, in which case data may need to point to the interior of
+       the buffer, not necessarily its start. *)
+    let byte_strides = field t "byte_strides" @@ ptr int64_t
+    let num_byte_strides = field t "num_byte_strides" size_t
+    let () = seal t
+  end
+
+  let buffer_memory_layout_type = make_enum "Buffer_MemoryLayout_Type" Pjrt_base.Types.Buffer_MemoryLayout_Type.values
+  let buffer_memory_layout : [ `Buffer_MemoryLayout ] structure typ = snd @@ make_struct_base "Buffer_MemoryLayout"
+
+  (* Describe the memory layout. It can be (1) a list of minor-to-major order and
+     optional tilings (each tile is a list of dimensions), or (2) a list of
+     strides. *)
+  module Buffer_MemoryLayout = struct
+    type t = [ `Buffer_MemoryLayout ]
+
+    let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_MemoryLayout"
+    let tiled = field t "tiled" buffer_memory_layout_tiled
+    let strides = field t "strides" buffer_memory_layout_strides
+    let type_ = field t "type" buffer_memory_layout_type
+    let () = seal t
+  end
+
   (* A callback to delete the value returned by PJRT_KeyValueGetCallback.  *)
   let keyValueGetCallback_ValueDeleter =
     typedef (static_funptr (ptr char @-> returning void)) @@ _NS "KeyValueGetCallback_ValueDeleter"
@@ -154,5 +211,219 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     (* Returns a string that identifies the platform (e.g. "cpu", "gpu", "tpu"). *)
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_PlatformName"
+  end
+
+  module Client_ProcessIndex = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_ProcessIndex_Args"
+      let client = field t "client" @@ ptr client
+      let process_index = field t "process_index" int (* out *)
+      let () = seal t
+    end
+
+    (* Return the process index of this client. Always 0 in single-process
+   settings. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_ProcessIndex"
+  end
+
+  module Client_PlatformVersion = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_PlatformVersion_Args"
+      let client = field t "client" @@ ptr client
+
+      (* `platform_version` has the same lifetime as `client`. It's owned by
+     `client`. *)
+      let platform_version = field t "platform_version" string (* out *)
+      let platform_version_size = field t "platform_version_size" size_t (* out *)
+      let () = seal t
+    end
+
+    (* Returns a string containing human-readable, platform-specific version info
+   (e.g. the CUDA version on GPU or libtpu version on Cloud TPU). *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_PlatformVersion"
+  end
+
+  module Client_TopologyDescription = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_TopologyDescription_Args"
+      let client = field t "client" @@ ptr client
+
+      (* Is owned by and has the same lifetime as `client`. *)
+      let topology = field t "topology" @@ ptr topologyDescription (* out *)
+      let () = seal t
+    end
+
+    (* Returns the topology description of the runtime topology. The returned
+   topology is owned by the client and should not be deleted by the caller. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_TopologyDescription"
+  end
+
+  module Client_Devices = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_Devices_Args"
+      let client = field t "client" @@ ptr client
+      let devices = field t "devices" @@ ptr (ptr device) (* out *)
+      let num_devices = field t "num_devices" size_t (* out *)
+      let () = seal t
+    end
+
+    (* Returns a list of all devices visible to the runtime, including addressable
+   and non-addressable devices. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Devices"
+  end
+
+  module Client_AddressableDevices = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_AddressableDevices_Args"
+      let client = field t "client" @@ ptr client
+      let addressable_devices = field t "addressable_devices" @@ ptr (ptr device) (* out *)
+      let num_addressable_devices = field t "num_addressable_devices" size_t (* out *)
+      let () = seal t
+    end
+
+    (* Returns a list of devices that are addressable from the client.
+   Addressable devices are those that the client can issue commands to.
+   All devices are addressable in a single-process environment. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_AddressableDevices"
+  end
+
+  module Client_LookupDevice = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_LookupDevice_Args"
+      let client = field t "client" @@ ptr client
+      let id = field t "id" int
+
+      (* `device` has the same lifetime as `client`. It is owned by `client`. *)
+      let device = field t "device" @@ ptr device (* out *)
+      let () = seal t
+    end
+
+    (* Returns a PJRT_Device* with the specified ID as returned by
+   PJRT_DeviceDescription_Id. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_LookupDevice"
+  end
+
+  module Client_LookupAddressableDevice = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_LookupAddressableDevice_Args"
+      let client = field t "client" @@ ptr client
+      let local_hardware_id = field t "local_hardware_id" int
+
+      (* `addressable_device` has the same lifetime as `client`. It is owned by
+     `client`. *)
+      let addressable_device = field t "addressable_device" @@ ptr device (* out *)
+      let () = seal t
+    end
+
+    (* Returns a PJRT_Device* with the specified local hardware ID as returned by
+   PJRT_Device_LocalHardwareId. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_LookupAddressableDevice"
+  end
+
+  module Client_AddressableMemories = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_AddressableMemories_Args"
+      let client = field t "client" @@ ptr client
+      let addressable_memories = field t "addressable_memories" @@ ptr (ptr memory) (* out *)
+      let num_addressable_memories = field t "num_addressable_memories" size_t (* out *)
+      let () = seal t
+    end
+
+    (* Returns a list of memories that are addressable from the client. Addressable
+   memories are those that the client can directly transfer data to and from.
+   All memories are addressable in a single-process environment. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_AddressableMemories"
+  end
+
+  let program : [ `Program ] structure typ = snd @@ make_struct_base "Program"
+
+  module Client_Compile = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_Compile_Args"
+      let client = field t "client" @@ ptr client
+
+      (* Only needs to stay alive for the duration of the Compile call.
+     `program->format` and `program->format_size` are owned by the caller. *)
+      let program = field t "program" @@ ptr program
+
+      (* TODO(b/240560013): consider putting some of option fields in priv.
+     Serialized CompileOptionsProto
+     (https://github.com/tensorflow/tensorflow/blob/master/tensorflow/compiler/xla/pjrt/compile_options.proto) *)
+      let compile_options = field t "compile_options" string
+      let compile_options_size = field t "compile_options_size" size_t
+      let executable = field t "executable" @@ ptr loadedExecutable (* out *)
+      let () = seal t
+    end
+
+    (* Compiles a program in specified format (such as MLIR or HLO) with given
+   `options`. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Compile"
+  end
+
+  module Client_DefaultDeviceAssignment = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_DefaultDeviceAssignment_Args"
+      let client = field t "client" @@ ptr client
+      let num_replicas = field t "num_replicas" int
+      let num_partitions = field t "num_partitions" int
+
+      (* Must be greater than or equal to `num_replicas * num_partitions` *)
+      let default_assignment_size = field t "default_assignment_size" size_t
+
+      (* Points to an array of size `default_assignment_size`.
+     This API writes `num_replicas * num_partitions` ints within that buffer.
+     The caller retains ownership of this memory. *)
+      let default_assignment = field t "default_assignment" @@ ptr int (* in/out *)
+      let () = seal t
+    end
+
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_DefaultDeviceAssignment"
+  end
+
+  module Client_DmaMap = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_DmaMap_Args"
+      let client = field t "client" @@ ptr client
+      let data = field t "data" @@ ptr void
+      let size_ = field t "size" size_t
+      let () = seal t
+    end
+
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_DmaMap"
+  end
+
+  module Client_DmaUnmap = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_DmaUnmap_Args"
+      let client = field t "client" @@ ptr client
+      let data = field t "data" @@ ptr void
+      let () = seal t
+    end
+
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_DmaUnmap"
   end
 end
