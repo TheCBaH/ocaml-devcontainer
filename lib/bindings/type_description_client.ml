@@ -39,6 +39,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     (* Returns true if this PJRT_Event has completed, including if an error has
        occurred. *)
-    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Event_IsReady"
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValueTryGetCallback"
   end
 end
