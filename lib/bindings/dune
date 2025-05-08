@@ -10,6 +10,7 @@
 
 (library
  (name pjrt)
+ (libraries pjrt_base)
  (foreign_archives pjrt)
  (ctypes
   (external_library_name libpjrt)
