@@ -32,6 +32,7 @@ module Base (F : Cstubs.Types.TYPE) = struct
   let error_struct : [ `Error ] structure typ = F.structure @@ _NS "Error"
   let error = ptr @@ typedef error_struct @@ ns "Error"
   let const_error = ptr @@ const @@ typedef error_struct @@ ns "Error"
+  let callbackError = ptr void (* forward declaration for proper callbackError from Types *)
 end
 
 module Types (F : Cstubs.Types.TYPE) = struct
@@ -92,6 +93,16 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let () = seal t
   end
 
+  let errorCode = make_enum "Error_Code" Types.Error_Code.values
+
+  (* Function for PJRT implementation to pass to callback functions provided by
+       caller so the callback can create a PJRT_Error* on error (to return to the
+       implementation). `message` is only required to live for the
+       PJRT_CallbackError call, i.e. the PJRT_CallbackError implementation must copy
+       `message` into the PJRT_Error. *)
+  let callbackError =
+    typedef (static_funptr (errorCode @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
+
   (*// ---------------------------------- Errors ----------------------------------- *)
   (* PJRT C API methods generally return a PJRT_Error*, which is nullptr if there
      is no error and set if there is. The implementation allocates any returned
@@ -129,9 +140,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let api = typedef (static_funptr (void @-> returning @@ ptr Destroy.Args.t)) @@ ns "Error_Message"
     end
 
-    (* Codes are based on https://abseil.io/docs/cpp/guides/status-codes *)
-    let code = make_enum "Error_Code" Types.Error_Code.values
-
     module GetCode = struct
       module Args = struct
         type t
@@ -140,19 +148,12 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let error = field t "error" const_error
 
         (* out *)
-        let code = field t "code" code
+        let code = field t "code" errorCode
         let () = seal t
       end
 
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Error_GetCode"
     end
-
-    (* Function for PJRT implementation to pass to callback functions provided by
-       caller so the callback can create a PJRT_Error* on error (to return to the
-       implementation). `message` is only required to live for the
-       PJRT_CallbackError call, i.e. the PJRT_CallbackError implementation must copy
-       `message` into the PJRT_Error. *)
-    let callback_error = typedef (static_funptr (code @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
   end
 
   let api_error = error

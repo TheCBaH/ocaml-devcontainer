@@ -6,10 +6,10 @@
         "switch": "default"
     },
     "cSpell.words": [
-        "OPAMROOT",
         "cpptools",
         "cstubs",
         "ctypes",
+        "Deleter",
         "devcontainers",
         "dlclose",
         "dllpjrt",
@@ -22,6 +22,7 @@
         "ocamllabs",
         "ocamlopt",
         "opam",
+        "OPAMROOT",
         "pjrt",
         "progn",
         "stablehlo",

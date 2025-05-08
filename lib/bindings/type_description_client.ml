@@ -17,4 +17,28 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
   let asyncHostToDeviceTransferManager : [ `AsyncHostToDeviceTransferManager ] structure typ =
     snd @@ make_struct_base "AsyncHostToDeviceTransferManager"
+
+  (* A callback to delete the value returned by PJRT_KeyValueGetCallback.  *)
+  let keyValueGetCallback_ValueDeleter =
+    typedef (static_funptr (ptr char @-> returning void)) @@ _NS "KeyValueGetCallback_ValueDeleter"
+
+  module KeyValueTryGetCallback = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_IsReady_Args"
+      let key = field t "key" string
+      let key_size = field t "key_size" size_t
+      let user_arg = field t "user_arg" @@ ptr void
+      let callback_error = field t "callback_error" @@ ptr callbackError
+      let value_ = field t "value" @@ ptr char (* out *)
+      let value_size = field t "value_size" size_t (* out *)
+      let value_deleter_callback = field t "value_deleter_callback;" keyValueGetCallback_ValueDeleter
+      let () = seal t
+    end
+
+    (* Returns true if this PJRT_Event has completed, including if an error has
+       occurred. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Event_IsReady"
+  end
 end
