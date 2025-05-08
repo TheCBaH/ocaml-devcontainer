@@ -46,7 +46,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
     module Args = struct
       type t
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "PJRT_KeyValuePutCallback_Args"
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "KeyValuePutCallback_Args"
       let key = field t "key" string
       let key_size = field t "key_size" size_t
 
@@ -63,6 +63,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
        (2) The caller that provides the two callbacks is responsible for avoiding
        key collisions between different users of key-value store (i.e. between
        different plugins, but not between different nodes in one plugin). *)
-    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "PJRT_KeyValuePutCallback"
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValuePutCallback"
   end
 end
