@@ -1,7 +1,7 @@
 ARG VARIANT=24.04
 FROM ubuntu:${VARIANT}
 RUN set -eux;\
-    if id -u ubuntu ; then userdel -r ubuntu; fi;\
+    if id -u ubuntu ; then userdel -r ubuntu 2>/dev/null; fi;\
     apt-get update;\
     env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends\
   ca-certificates\

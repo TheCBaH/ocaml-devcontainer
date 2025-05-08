@@ -6,6 +6,7 @@
         "switch": "default"
     },
     "cSpell.words": [
+        "autoremove",
         "cpptools",
         "cstubs",
         "ctypes",
@@ -17,6 +18,7 @@
         "fpic",
         "funptr",
         "libpjrt",
+        "noninteractive",
         "nullptr",
         "ocamlformat",
         "ocamllabs",
