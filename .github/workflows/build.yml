@@ -19,23 +19,12 @@ jobs:
     - name: setup
       run: |
         echo 'EXEC=${{ steps.devcontainer.outputs.exec }}' >> $GITHUB_ENV
+    - name: download
+      run: |
+        ${{ env.EXEC }} make -C lib/bindings/ download
     - name: build
       run: |
         ${{ env.EXEC }} make
-        file _build/default/main.exe
-        ls -lh _build/default/main.exe
     - name: run
       run: |
         ${{ env.EXEC }} make run
-    - name: top
-      run: |
-        echo 'Example.Hello.print ();;' | ${{ env.EXEC }} make top
-    - name: utop
-      run: |
-        echo 'Example.Hello.print ();;' | ${{ env.EXEC }} make utop
-    - name: static
-      run: |
-        ${{ env.EXEC }} make static
-        file _build/default/main.exe
-        ls -lh _build/default/main.exe
-        _build/default/main.exe

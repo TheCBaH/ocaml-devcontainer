@@ -1,6 +1,6 @@
 // For format details, see https://aka.ms/devcontainer.json.
 {
-    "name": "ocaml devcontainers examples",
+    "name": "Devcontainers OCaml for PJRT bindings",
     "build":  {
         "dockerfile": "Dockerfile"
     },

@@ -28,5 +28,6 @@
         "stablehlo",
         "toplevel",
         "utop"
-    ]
+    ],
+    "explorer.excludeGitIgnore": true
 }
