@@ -82,5 +82,4 @@ module Types (F : Cstubs.Types.TYPE) = struct
     (* Creates a new PJRT_Client instance. *)
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Create"
   end
-
 end
