@@ -1,0 +1,13 @@
+(library
+ (name pjrt_base)
+ (foreign_archives ../pjrt)
+ (ctypes
+  (external_library_name libpjrt)
+  (build_flags_resolver (vendored))
+  (headers
+   (preamble "#include \"../pjrt.h\""))
+  (type_description
+   (instance Types)
+   (functor Type_description))
+  (generated_types Types_generated)
+  (generated_entry_point C)))
