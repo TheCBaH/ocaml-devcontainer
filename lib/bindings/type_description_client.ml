@@ -138,4 +138,21 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Destroy"
   end
+
+  module Client_PlatformName = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_PlatformName_Args"
+      let client = field t "client" @@ ptr client
+
+      (* `platform_name` has the same lifetime as `client`. It is owned by `client`. *)
+      let platform_name = field t "platform_name" string (* out *)
+      let platform_name_size = field t "platform_name_size" size_t (* out *)
+      let () = seal t
+    end
+
+    (* Returns a string that identifies the platform (e.g. "cpu", "gpu", "tpu"). *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_PlatformName"
+  end
 end
