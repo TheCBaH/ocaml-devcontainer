@@ -90,7 +90,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValuePutCallback"
   end
 
-  (* Bindings for PJRT_Client_Create *)
   module ClientCreate = struct
     module Args = struct
       type t
@@ -126,5 +125,17 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     (* Creates a new PJRT_Client instance. *)
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Create"
+  end
+
+  module Client_Destroy = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_Destroy_Args"
+      let client = field t "client" @@ ptr client
+      let () = seal t
+    end
+
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Destroy"
   end
 end
