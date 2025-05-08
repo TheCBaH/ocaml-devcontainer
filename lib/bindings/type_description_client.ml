@@ -22,18 +22,42 @@ module Types (F : Cstubs.Types.TYPE) = struct
   let keyValueGetCallback_ValueDeleter =
     typedef (static_funptr (ptr char @-> returning void)) @@ _NS "KeyValueGetCallback_ValueDeleter"
 
+  module KeyValueGetCallback = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "KeyValueGetCallback_Args"
+      let key = field t "key" string
+      let key_size = field t "key_size" size_t
+      let timeout_in_ms = field t "timeout_in_ms" int
+      let callback_error = field t "callback_error" @@ ptr callbackError
+      let user_arg = field t "user_arg" @@ ptr void
+      let value_ = field t "value" @@ ptr char (* out *)
+      let value_size = field t "value_size" size_t (* out *)
+      let value_deleter_callback = field t "value_deleter_callback" keyValueGetCallback_ValueDeleter (* out *)
+      let () = seal t
+    end
+
+    (* Requirements for PJRT_KeyValueGetCallback implementation: (1) Thread-safe.
+       (2) The caller that provides the two callbacks is responsible for avoiding
+       key collisions between different users of key-value store (i.e. between
+       different plugins, but not between different nodes in one plugin). (3)
+       Blocking. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValueGetCallback"
+  end
+
   module KeyValueTryGetCallback = struct
     module Args = struct
       type t
 
-      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Event_IsReady_Args"
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "KeyValueTryGetCallback_Args"
       let key = field t "key" string
       let key_size = field t "key_size" size_t
       let user_arg = field t "user_arg" @@ ptr void
       let callback_error = field t "callback_error" @@ ptr callbackError
       let value_ = field t "value" @@ ptr char (* out *)
       let value_size = field t "value_size" size_t (* out *)
-      let value_deleter_callback = field t "value_deleter_callback;" keyValueGetCallback_ValueDeleter
+      let value_deleter_callback = field t "value_deleter_callback" keyValueGetCallback_ValueDeleter
       let () = seal t
     end
 
@@ -72,10 +96,31 @@ module Types (F : Cstubs.Types.TYPE) = struct
       type t
 
       let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_Create_Args"
-      let options = field t "options" @@ ptr void
-      let options_size = field t "options_size" size_t
+
+      (* Extra platform-specific options to create a client. *)
+      let create_options = field t "create_options" @@ ptr void
+      let num_options = field t "num_options" size_t (* num_options in C *)
+
+      (* Key-value get/put callback provided by the caller of PJRT_Client_Create. *)
+      (* PJRT client can use these callbacks to share information between *)
+      (* processes/nodes. *)
+      let kv_get_callback = field t "kv_get_callback" KeyValueGetCallback.api
+
+      (* Will be passed to `kv_get_callback` as `user_arg` argument. *)
+      let kv_get_user_arg = field t "kv_get_user_arg" (ptr void)
+      let kv_put_callback = field t "kv_put_callback" KeyValuePutCallback.api
+
+      (* Will be passed to `kv_put_callback` as `user_arg` argument. *)
+      let kv_put_user_arg = field t "kv_put_user_arg" (ptr void)
+
+      (* Key-value try-get callback provided by the caller of PJRT_Client_Create. *)
+      (* Same as key-value get callback, but returns `NotFoundError` immediately if *)
+      (* the key is not found. *)
+      let kv_try_get_callback = field t "kv_try_get_callback" KeyValueTryGetCallback.api
+
+      (* Will be passed to `kv_try_get_callback` as `user_arg` argument. *)
+      let kv_try_get_user_arg = field t "kv_try_get_user_arg" (ptr void)
       let client = field t "client" @@ ptr client (* out *)
-      let callback_error = field t "callback_error" @@ ptr callbackError
       let () = seal t
     end
 
