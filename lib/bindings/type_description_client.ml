@@ -65,4 +65,22 @@ module Types (F : Cstubs.Types.TYPE) = struct
        different plugins, but not between different nodes in one plugin). *)
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValuePutCallback"
   end
+
+  (* Bindings for PJRT_Client_Create *)
+  module ClientCreate = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_Create_Args"
+      let options = field t "options" @@ ptr void
+      let options_size = field t "options_size" size_t
+      let client = field t "client" @@ ptr client (* out *)
+      let callback_error = field t "callback_error" @@ ptr callbackError
+      let () = seal t
+    end
+
+    (* Creates a new PJRT_Client instance. *)
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Create"
+  end
+
 end
