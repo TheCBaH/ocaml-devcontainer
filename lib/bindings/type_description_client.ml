@@ -18,7 +18,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
   let asyncHostToDeviceTransferManager : [ `AsyncHostToDeviceTransferManager ] structure typ =
     snd @@ make_struct_base "AsyncHostToDeviceTransferManager"
 
-  let buffer_memory_layout_tiled : [ `Buffer_MemoryLayout_Tiled ] structure typ =
+  let bufferMemoryLayoutTiled : [ `Buffer_MemoryLayout_Tiled ] structure typ =
     snd @@ make_struct_base "Buffer_MemoryLayout_Tiled"
 
   (* A map from physical dimension numbers to logical dimension numbers.
@@ -42,7 +42,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let () = seal t
   end
 
-  let buffer_memory_layout_strides : [ `Buffer_MemoryLayout_Strides ] structure typ =
+  let bufferMemoryLayoutStrides : [ `Buffer_MemoryLayout_Strides ] structure typ =
     snd @@ make_struct_base "Buffer_MemoryLayout_Strides"
 
   module Buffer_MemoryLayout_Strides = struct
@@ -59,8 +59,10 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let () = seal t
   end
 
-  let buffer_memory_layout_type = make_enum "Buffer_MemoryLayout_Type" Pjrt_base.Types.Buffer_MemoryLayout_Type.values
-  let buffer_memory_layout : [ `Buffer_MemoryLayout ] structure typ = snd @@ make_struct_base "Buffer_MemoryLayout"
+  let bufferMemoryLayoutType = make_enum "Buffer_MemoryLayout_Type" Pjrt_base.Types.Buffer_MemoryLayout_Type.values
+  let bufferType = make_enum "Buffer_Type" Pjrt_base.Types.Buffer_Type.values
+  let hostBufferSemantics = make_enum "HostBufferSemantics" Pjrt_base.Types.HostBufferSemantics.values
+  let bufferMemoryLayout : [ `Buffer_MemoryLayout ] structure typ = snd @@ make_struct_base "Buffer_MemoryLayout"
 
   (* Describe the memory layout. It can be (1) a list of minor-to-major order and
      optional tilings (each tile is a list of dimensions), or (2) a list of
@@ -69,9 +71,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
     type t = [ `Buffer_MemoryLayout ]
 
     let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_MemoryLayout"
-    let tiled = field t "tiled" buffer_memory_layout_tiled
-    let strides = field t "strides" buffer_memory_layout_strides
-    let type_ = field t "type" buffer_memory_layout_type
+    let tiled = field t "tiled" bufferMemoryLayoutTiled
+    let strides = field t "strides" bufferMemoryLayoutStrides
+    let type_ = field t "type" bufferMemoryLayoutType
     let () = seal t
   end
 
@@ -425,5 +427,31 @@ module Types (F : Cstubs.Types.TYPE) = struct
     end
 
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_DmaUnmap"
+  end
+
+  module Client_BufferFromHostBuffer = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Client_BufferFromHostBuffer_Args"
+      let client = field t "client" @@ ptr client
+      let data = field t "data" @@ ptr void
+      let type_ = field t "type" bufferType
+      let dims = field t "dims" @@ ptr int64_t
+      let num_dims = field t "num_dims" size_t
+      let byte_strides = field t "byte_strides" @@ ptr int64_t
+      let num_byte_strides = field t "num_byte_strides" size_t
+      let host_buffer_semantics = field t "host_buffer_semantics" hostBufferSemantics
+
+      (* `device` and `memory_layout` are owned by the caller. *)
+      let device = field t "device" @@ ptr device
+      let memory = field t "memory" @@ ptr memory (* optional *)
+      let device_layout = field t "device_layout" @@ ptr bufferMemoryLayout
+      let done_with_host_buffer = field t "done_with_host_buffer" @@ ptr event (* out *)
+      let buffer = field t "buffer" @@ ptr buffer (* out *)
+      let () = seal t
+    end
+
+    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_BufferFromHostBuffer"
   end
 end

@@ -23,6 +23,7 @@ module Base (F : Cstubs.Types.TYPE) = struct
 
   let extensionBase : [ `Extension_Base ] structure typ = snd @@ make_struct_base "Extension_Base"
   let namedValue : [ `Extension_Base ] structure typ = snd @@ make_struct_base "NamedValue"
+  let event : [ `Event ] structure typ = snd @@ make_struct_base "Event"
 
   let pjrt_struct name =
     let struct_size, size, t = make_struct name in
