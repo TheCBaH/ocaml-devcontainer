@@ -300,4 +300,32 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_AddressableByDevices"
     end
   end
+
+  module ExecuteContext = struct
+    module Create = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "ExecuteContext_Create_Args"
+
+        (* Add fields based on PJRT_ExecuteContext_Create_Args if any, typically for options or context pointers *)
+        let context = field t "context" @@ ptr executeContext (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "ExecuteContext_Create"
+    end
+
+    module Destroy = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "ExecuteContext_Destroy_Args"
+        let context = field t "context" @@ ptr executeContext
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "ExecuteContext_Destroy"
+    end
+  end
 end

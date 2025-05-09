@@ -43,6 +43,7 @@ module Base (F : Cstubs.Types.TYPE) = struct
   let executable : [ `Executable ] structure typ = snd @@ make_struct_base "Executable"
   let loadedExecutable : [ `LoadedExecutable ] structure typ = snd @@ make_struct_base "LoadedExecutable"
   let buffer : [ `Buffer ] structure typ = snd @@ make_struct_base "Buffer"
+  let executeContext : [ `ExecuteContext ] structure typ = snd @@ make_struct_base "ExecuteContext"
 end
 
 module Types (F : Cstubs.Types.TYPE) = struct
