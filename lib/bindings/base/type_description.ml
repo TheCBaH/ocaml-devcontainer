@@ -119,7 +119,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
        PJRT_CallbackError call, i.e. the PJRT_CallbackError implementation must copy
        `message` into the PJRT_Error. *)
   let callbackError =
-    typedef (static_funptr (errorCode @-> string @-> size_t @-> returning error)) @@ ns "CallbackError"
+    typedef
+      (static_funptr (errorCode (* code *) @-> string (* message *) @-> size_t (* message_size *) @-> returning error))
+    @@ ns "CallbackError"
 
   (*// ---------------------------------- Errors ----------------------------------- *)
   (* PJRT C API methods generally return a PJRT_Error*, which is nullptr if there
@@ -137,7 +139,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       end
 
       (* Frees `error`. `error` can be nullptr. *)
-      let api = typedef (static_funptr (void @-> returning @@ ptr Args.t)) @@ _NS "Error_Destroy"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning void)) @@ _NS "Error_Destroy"
     end
 
     module Message = struct
@@ -155,7 +157,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Gets the human-readable reason for `error`. `message` has the lifetime of
        `error`. *)
-      let api = typedef (static_funptr (void @-> returning @@ ptr Destroy.Args.t)) @@ ns "Error_Message"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning void)) @@ _NS "Error_Message"
     end
 
     module GetCode = struct
@@ -170,7 +172,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Error_GetCode"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Error_GetCode"
     end
   end
 

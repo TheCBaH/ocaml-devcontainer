@@ -69,7 +69,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
   (* A callback to delete the value returned by PJRT_KeyValueGetCallback.  *)
   let keyValueGetCallback_ValueDeleter =
-    typedef (static_funptr (ptr char @-> returning void)) @@ _NS "KeyValueGetCallback_ValueDeleter"
+    typedef (static_funptr (ptr char (* value *) @-> returning void)) @@ _NS "KeyValueGetCallback_ValueDeleter"
 
   module KeyValueGetCallback = struct
     module Args = struct
@@ -92,7 +92,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
        key collisions between different users of key-value store (i.e. between
        different plugins, but not between different nodes in one plugin). (3)
        Blocking. *)
-    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValueGetCallback"
+    let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "KeyValueGetCallback"
   end
 
   module KeyValueTryGetCallback = struct
@@ -112,7 +112,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     (* Returns true if this PJRT_Event has completed, including if an error has
        occurred. *)
-    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValueTryGetCallback"
+    let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "KeyValueTryGetCallback"
   end
 
   module KeyValuePutCallback = struct
@@ -136,7 +136,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
        (2) The caller that provides the two callbacks is responsible for avoiding
        key collisions between different users of key-value store (i.e. between
        different plugins, but not between different nodes in one plugin). *)
-    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "KeyValuePutCallback"
+    let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "KeyValuePutCallback"
   end
 
   let program : [ `Program ] structure typ = snd @@ make_struct_base "Program"
@@ -176,7 +176,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       end
 
       (* Creates a new PJRT_Client instance. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Create"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_Create"
     end
 
     module Destroy = struct
@@ -188,7 +188,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Destroy"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_Destroy"
     end
 
     module PlatformName = struct
@@ -205,7 +205,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       end
 
       (* Returns a string that identifies the platform (e.g. "cpu", "gpu", "tpu"). *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_PlatformName"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_PlatformName"
     end
 
     module ProcessIndex = struct
@@ -220,7 +220,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Return the process index of this client. Always 0 in single-process
      settings. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_ProcessIndex"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_ProcessIndex"
     end
 
     module PlatformVersion = struct
@@ -239,7 +239,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Returns a string containing human-readable, platform-specific version info
      (e.g. the CUDA version on GPU or libtpu version on Cloud TPU). *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_PlatformVersion"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_PlatformVersion"
     end
 
     module TopologyDescription = struct
@@ -256,7 +256,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Returns the topology description of the runtime topology. The returned
      topology is owned by the client and should not be deleted by the caller. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_TopologyDescription"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_TopologyDescription"
     end
 
     module Devices = struct
@@ -272,7 +272,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Returns a list of all devices visible to the runtime, including addressable
      and non-addressable devices. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Devices"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_Devices"
     end
 
     module AddressableDevices = struct
@@ -289,7 +289,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       (* Returns a list of devices that are addressable from the client.
      Addressable devices are those that the client can issue commands to.
      All devices are addressable in a single-process environment. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_AddressableDevices"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_AddressableDevices"
     end
 
     module LookupDevice = struct
@@ -307,7 +307,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Returns a PJRT_Device* with the specified ID as returned by
      PJRT_DeviceDescription_Id. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_LookupDevice"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_LookupDevice"
     end
 
     module LookupAddressableDevice = struct
@@ -328,7 +328,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Returns a PJRT_Device* with the specified local hardware ID as returned by
      PJRT_Device_LocalHardwareId. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_LookupAddressableDevice"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_LookupAddressableDevice"
     end
 
     module AddressableMemories = struct
@@ -345,7 +346,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       (* Returns a list of memories that are addressable from the client. Addressable
      memories are those that the client can directly transfer data to and from.
      All memories are addressable in a single-process environment. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_AddressableMemories"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_AddressableMemories"
     end
 
     module Compile = struct
@@ -370,7 +371,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Compiles a program in specified format (such as MLIR or HLO) with given
      `options`. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_Compile"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_Compile"
     end
 
     module DefaultDeviceAssignment = struct
@@ -394,7 +395,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_DefaultDeviceAssignment"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_DefaultDeviceAssignment"
     end
 
     module DmaMap = struct
@@ -408,7 +410,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_DmaMap"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_DmaMap"
     end
 
     module DmaUnmap = struct
@@ -421,7 +423,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_DmaUnmap"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_DmaUnmap"
     end
 
     module BufferFromHostBuffer = struct
@@ -473,7 +475,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       end
 
       (* Asynchronously copies a buffer stored on host to device memory. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_BufferFromHostBuffer"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_BufferFromHostBuffer"
     end
 
     module CreateViewOfDeviceBuffer = struct
@@ -500,7 +502,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         (* A callback to be performed when the PJRT_Buffer is done with the on-device
            buffer. This callback is optional and can be a nullptr. *)
-        let on_delete_callback = field t "on_delete_callback" @@ static_funptr (ptr void @-> ptr void @-> returning void)
+        let on_delete_callback =
+          field t "on_delete_callback"
+          @@ static_funptr (ptr void (* device_buffer_ptr *) @-> ptr void (* user_arg *) @-> returning void)
 
         (* `on_delete_callback_arg` will be passed to `on_delete_callback` as
            `user_arg` argument. *)
@@ -526,7 +530,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
          (typically allocated by another library). The buffer may be mutated,
          for example, if the buffer is donated to an Execute operation. This method is
          not required on all hardware platforms. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_CreateViewOfDeviceBuffer"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_CreateViewOfDeviceBuffer"
     end
 
     module CreateBuffersForAsyncHostToDevice = struct
@@ -547,7 +552,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
       end
 
       let api =
-        typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Client_CreateBuffersForAsyncHostToDevice"
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error))
+        @@ _NS "Client_CreateBuffersForAsyncHostToDevice"
     end
   end
 end

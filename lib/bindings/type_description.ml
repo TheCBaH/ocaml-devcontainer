@@ -16,7 +16,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       end
 
       (* One-time plugin setup. Must be called before any other functions are called. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Plugin_Initialize"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Plugin_Initialize"
     end
 
     module Attributes = struct
@@ -34,7 +34,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       (* Returns an array of plugin attributes which are key-value pairs. Common keys
        include `xla_version`, `stablehlo_current_version`, and
        `stablehlo_minimum_version`. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Plugin_Attributes"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Plugin_Attributes"
     end
   end
 

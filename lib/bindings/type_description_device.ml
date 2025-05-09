@@ -25,7 +25,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
       (* The ID of this device. IDs are unique among devices of this type
          (e.g. CPUs, GPUs). On multi-host platforms, this will be unique across all
          hosts' devices. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "DeviceDescription_Id"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "DeviceDescription_Id"
     end
 
     module ProcessIndex = struct
@@ -45,7 +45,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
          multi-process setting, where each client can see devices from all
          processes, but only a subset of them are addressable and have the same
          process_index as the client. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "DeviceDescription_ProcessIndex"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "DeviceDescription_ProcessIndex"
     end
 
     module Attributes = struct
@@ -61,7 +62,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Returns an array of device specific attributes with attribute name, value
          and value type. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "DeviceDescription_Attributes"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "DeviceDescription_Attributes"
     end
 
     module Kind = struct
@@ -80,7 +82,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* A vendor-dependent string that uniquely identifies the kind of device,
          e.g. "Tesla T4". *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "DeviceDescription_Kind"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "DeviceDescription_Kind"
     end
 
     module DebugString = struct
@@ -96,7 +98,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Debug string suitable for logging when errors occur. Should be verbose
          enough to identify the exact device, e.g., its complete name. *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "DeviceDescription_DebugString"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "DeviceDescription_DebugString"
     end
 
     module ToString = struct
@@ -112,7 +115,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Debug string suitable for reading by end users, should be reasonably terse,
          for example: "CpuDevice(id=0)". *)
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "DeviceDescription_ToString"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "DeviceDescription_ToString"
     end
   end
 
@@ -127,7 +130,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_GetDescription"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_GetDescription"
     end
 
     module IsAddressable = struct
@@ -140,7 +143,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_IsAddressable"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_IsAddressable"
     end
 
     module LocalHardwareId = struct
@@ -153,7 +156,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_LocalHardwareId"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_LocalHardwareId"
     end
 
     module AddressableMemories = struct
@@ -167,7 +170,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_AddressableMemories"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_AddressableMemories"
     end
 
     module DefaultMemory = struct
@@ -180,7 +183,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_DefaultMemory"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_DefaultMemory"
     end
 
     module MemoryStats = struct
@@ -213,7 +216,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_MemoryStats"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_MemoryStats"
     end
   end
 
@@ -228,7 +231,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_Id"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_Id"
     end
 
     module Kind = struct
@@ -242,7 +245,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_Kind"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_Kind"
     end
 
     module KindId = struct
@@ -255,7 +258,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_Kind_Id"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_Kind_Id"
     end
 
     module DebugString = struct
@@ -269,7 +272,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_DebugString"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_DebugString"
     end
 
     module ToString = struct
@@ -283,7 +286,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_ToString"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_ToString"
     end
 
     module AddressableByDevices = struct
@@ -297,7 +300,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_AddressableByDevices"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_AddressableByDevices"
     end
   end
 
@@ -313,7 +316,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "ExecuteContext_Create"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "ExecuteContext_Create"
     end
 
     module Destroy = struct
@@ -325,7 +328,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "ExecuteContext_Destroy"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "ExecuteContext_Destroy"
     end
   end
 
@@ -341,7 +344,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Destroy"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_Destroy"
     end
 
     module Name = struct
@@ -355,7 +358,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Name"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_Name"
     end
 
     module NumReplicas = struct
@@ -368,7 +371,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_NumReplicas"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_NumReplicas"
     end
 
     module NumPartitions = struct
@@ -381,7 +384,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_NumPartitions"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_NumPartitions"
     end
 
     module OptimizedProgram = struct
@@ -394,7 +397,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OptimizedProgram"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_OptimizedProgram"
     end
 
     module NumOutputs = struct
@@ -407,7 +410,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_NumOutputs"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_NumOutputs"
     end
 
     module SizeOfGeneratedCodeInBytes = struct
@@ -422,7 +425,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_SizeOfGeneratedCodeInBytes"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error))
+        @@ _NS "Executable_SizeOfGeneratedCodeInBytes"
     end
 
     module Fingerprint = struct
@@ -436,7 +441,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Fingerprint"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_Fingerprint"
     end
 
     module GetCostAnalysis = struct
@@ -450,7 +455,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_GetCostAnalysis"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_GetCostAnalysis"
     end
 
     module GetCompiledMemoryStats = struct
@@ -474,7 +479,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_GetCompiledMemoryStats"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_GetCompiledMemoryStats"
     end
 
     module OutputElementTypes = struct
@@ -491,7 +497,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OutputElementTypes"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_OutputElementTypes"
     end
 
     module OutputDimensions = struct
@@ -506,7 +513,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OutputDimensions"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_OutputDimensions"
     end
 
     module OutputMemoryKinds = struct
@@ -521,11 +528,12 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OutputMemoryKinds"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_OutputMemoryKinds"
     end
 
     module Serialize = struct
-      let deleter = static_funptr (ptr serializedExecutable @-> returning void)
+      let deleter = static_funptr (ptr serializedExecutable (* exec *) @-> returning void)
 
       module Args = struct
         type t
@@ -542,7 +550,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Serialize"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_Serialize"
     end
 
     (* PJRT_Executable_DeserializeAndLoad is more related to client, might move later *)
@@ -558,7 +566,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_DeserializeAndLoad"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_DeserializeAndLoad"
     end
   end
 
@@ -572,7 +581,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Destroy"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_Destroy"
     end
 
     module GetExecutable = struct
@@ -587,7 +596,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_GetExecutable"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_GetExecutable"
     end
 
     module AddressableDevices = struct
@@ -603,7 +613,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_AddressableDevices"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_AddressableDevices"
     end
 
     module Delete = struct
@@ -615,7 +626,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Delete"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_Delete"
     end
 
     module IsDeleted = struct
@@ -628,14 +639,15 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_IsDeleted"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_IsDeleted"
     end
 
     module Execute = struct
       module Chunk = struct
         type t
 
-        let _, (t : t structure typ) = make_struct_base "Chunk"
+        let _, (t : t structure typ) = make_struct_base "Chunk" (* Note: PJRT_Chunk is not a pjrt_struct *)
+        let data = field t "data" @@ ptr void
         let size = field t "size" size_t
 
         let deleter =
@@ -650,11 +662,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
         typedef
           (static_funptr
              (ptr Chunk.t (* chunk *) @-> ptr callbackError
-             (* callback_error *) @-> size_t
-             (* total_size_in_bytes *) @-> bool
-             (* done *) @-> ptr void
-             (* user_arg *) @-> returning
-             @@ ptr error))
+             (* callback_error *) @-> size_t (* total_size_in_bytes *)
+             @-> bool (* done *) @-> ptr void
+             (* user_arg *) @-> returning error))
         @@ _NS "SendCallback"
 
       let recvCallback =
@@ -747,7 +757,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Execute"
+      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_Execute"
     end
 
     module Fingerprint = struct
@@ -764,7 +774,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Fingerprint"
+      let api =
+        typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_Fingerprint"
     end
   end
 end
