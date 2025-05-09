@@ -693,6 +693,40 @@ module Types (F : Cstubs.Types.TYPE) = struct
         type t
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "ExecuteOptions"
+
+        (* Callbacks for when send/recv ops are executed. The outer lists correspond
+           to each device returned by `PJRT_Executable_AddressableDevices` for
+           `executable` (i.e. they will have length `num_devices`). Each inner list
+           contains callback info for each send/recv op in `executable`; the order
+           doesn't matter as the channel IDs are used instead. The callbacks can be
+           stateful and the user code is responsible for managing state. The callback
+           functions must outlive the execution (but not the info structs or lists). *)
+        let send_callbacks = field t "send_callbacks" @@ ptr (ptr SendCallbackInfo.t)
+        let recv_callbacks = field t "recv_callbacks" @@ ptr (ptr RecvCallbackInfo.t)
+        let num_send_ops = field t "num_send_ops" size_t
+        let num_recv_ops = field t "num_recv_ops" size_t
+
+        (* If non-zero, identifies this execution as part of a potentially
+           multi-device launch. This can be used to detect scheduling errors, e.g. if
+           multi-host programs are launched in different orders on different hosts,
+           the launch IDs may be used by the runtime to detect the mismatch. *)
+        let launch_id = field t "launch_id" int
+
+        (* A list of indices denoting the input buffers that should not be donated.
+           An input buffer may be non-donable, for example, if it is referenced more
+           than once. Since such runtime information is not available at compile time,
+           the compiler might mark the input as `may-alias`, which could lead PjRt to
+           donate the input buffer when it should not. By defining this list of
+           indices, a higher-level PJRT caller can instruct PJRT client not to donate
+           specific input buffers. The caller needs to make sure to keep it alive
+           during the call. *)
+        let non_donatable_input_indices = field t "non_donatable_input_indices" @@ ptr int64_t
+        let num_non_donatable_input_indices = field t "num_non_donatable_input_indices" size_t
+
+        let context =
+          field t "context"
+          @@ ptr executeContext (* Optional in some PJRT versions, corresponds to PJRT_ExecuteOptions.context *)
+
         let () = seal t
       end
 
