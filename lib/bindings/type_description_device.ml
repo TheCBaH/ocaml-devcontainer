@@ -11,8 +11,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
      compiling executables without hardware available, which can then be
      serialized and written somewhere durable, and then loaded and run on actual
      hardware later. *)
-  let deviceDescription : [ `DeviceDescription ] structure typ = snd @@ make_struct_base "DeviceDescription"
-
   module DeviceDescription_Id = struct
     module Args = struct
       type t

@@ -34,6 +34,15 @@ module Base (F : Cstubs.Types.TYPE) = struct
   let error = ptr @@ typedef error_struct @@ ns "Error"
   let const_error = ptr @@ const @@ typedef error_struct @@ ns "Error"
   let callbackError = ptr void (* forward declaration for proper callbackError from Types *)
+  let client : [ `Client ] structure typ = snd @@ make_struct_base "Client"
+  let device : [ `Device ] structure typ = snd @@ make_struct_base "Device"
+  let memory : [ `Memory ] structure typ = snd @@ make_struct_base "Memory"
+  let shapeSpec : [ `ShapeSpec ] structure typ = snd @@ make_struct_base "ShapeSpec"
+  let deviceDescription : [ `DeviceDescription ] structure typ = snd @@ make_struct_base "DeviceDescription"
+  let topologyDescription : [ `TopologyDescription ] structure typ = snd @@ make_struct_base "TopologyDescription"
+  let executable : [ `Executable ] structure typ = snd @@ make_struct_base "Executable"
+  let loadedExecutable : [ `LoadedExecutable ] structure typ = snd @@ make_struct_base "LoadedExecutable"
+  let buffer : [ `Buffer ] structure typ = snd @@ make_struct_base "Buffer"
 end
 
 module Types (F : Cstubs.Types.TYPE) = struct
