@@ -150,7 +150,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         (* Extra platform-specific options to create a client. *)
         let create_options = field t "create_options" @@ ptr void
-        let num_options = field t "num_options" size_t (* num_options in C *)
+        let num_options = field t "num_options" size_t
 
         (* Key-value get/put callback provided by the caller of PJRT_Client_Create. *)
         (* PJRT client can use these callbacks to share information between *)

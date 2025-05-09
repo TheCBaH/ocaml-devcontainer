@@ -789,6 +789,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Deletes the underlying runtime objects as if 'PJRT_Buffer_Delete' were
+         called and frees `buffer`. `buffer` can be nullptr. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_Destroy"
     end
 
@@ -805,6 +807,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Returns the type of the array elements of a buffer. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_ElementType"
     end
 
@@ -819,6 +822,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Returns the array shape of `buffer`, i.e. the size of each dimension. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_Dimensions"
     end
 
@@ -833,6 +837,13 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Returns the unpadded array shape of `buffer`. This usually is equivalent to
+         PJRT_Buffer_Dimensions, but for implementations that support
+         dynamically-sized dimensions via padding to a fixed size, any dynamic
+         dimensions may have a smaller unpadded size than the padded size reported by
+         PJRT_Buffer_Dimensions. ("Dynamic" dimensions are those whose length is
+         only known at runtime, vs. "static" dimensions whose size is fixed at compile
+         time.) *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_UnpaddedDimensions"
     end
 
@@ -842,6 +853,10 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) =
           pjrt_struct "Buffer_DynamicDimensionIndices_Args"
+        (* Returns the indices of dynamically-sized dimensions, or an empty list if all
+         dimensions are static. ("Dynamic" dimensions are those whose length is
+         only known at runtime, vs. "static" dimensions whose size is fixed at compile
+         time.) *)
 
         let buffer = field t "buffer" @@ ptr buffer
         let dynamic_dim_indices = field t "dynamic_dim_indices" @@ ptr @@ const size_t (* out *)
@@ -851,6 +866,9 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_DynamicDimensionIndices"
     end
+    (* DEPRECATED. Please use layout extension instead.
+         https://github.com/openxla/xla/blob/main/xla/pjrt/c/pjrt_c_api_layouts_extension.h
+         Returns the memory layout of the data in this buffer. *)
 
     module GetMemoryLayout = struct
       module Args = struct
