@@ -632,6 +632,44 @@ module Types (F : Cstubs.Types.TYPE) = struct
     end
 
     module Execute = struct
+      module Chunk = struct
+        type t
+
+        let _, (t : t structure typ) = make_struct_base "Chunk"
+        let size = field t "size" size_t
+
+        let deleter =
+          field t "deleter" @@ static_funptr (ptr void (* data *) @-> ptr void (* deleter_arg *) @-> returning void)
+
+        (* `deleter_arg` will be passed to `deleter` as `deleter_arg` argument. *)
+        let deleter_arg = field t "deleter_arg" @@ ptr void
+        let () = seal t
+      end
+
+      let sendCallback =
+        typedef
+          (static_funptr
+             (ptr Chunk.t (* chunk *) @-> ptr callbackError
+             (* callback_error *) @-> size_t
+             (* total_size_in_bytes *) @-> bool
+             (* done *) @-> ptr void
+             (* user_arg *) @-> returning
+             @@ ptr error))
+        @@ _NS "SendCallback"
+
+      let recvCallback =
+        typedef (static_funptr (ptr copyToDeviceStream (* stream *) @-> ptr void (* user_arg *) @-> returning void))
+        @@ _NS "RecvCallback"
+
+      module SendCallbackInfo = struct
+        type t
+
+        let _, size, (t : t structure typ) = make_struct_traits "SendCallbackInfo"
+        let channel_id = field t "channel_id" int64_t
+        let user_arg = field t "user_arg" @@ ptr void
+        let () = seal t
+      end
+
       module Options = struct
         type t
 
@@ -642,21 +680,21 @@ module Types (F : Cstubs.Types.TYPE) = struct
       module Args = struct
         type t
 
-        let extension_start, struct_size, size, (t_args : t structure typ) = pjrt_struct "LoadedExecutable_Execute_Args"
-        let executable = field t_args "executable" @@ ptr executable
-        let options = field t_args "options" @@ ptr Options.t
-        let argument_lists = field t_args "argument_lists" @@ ptr (ptr (ptr buffer)) (* PJRT_Buffer* const* const* *)
-        let num_devices = field t_args "num_devices" size_t
-        let num_args = field t_args "num_args" size_t
-        let output_lists = field t_args "output_lists" @@ ptr (ptr (ptr buffer))
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "LoadedExecutable_Execute_Args"
+        let executable = field t "executable" @@ ptr executable
+        let options = field t "options" @@ ptr Options.t
+        let argument_lists = field t "argument_lists" @@ ptr (ptr (ptr buffer)) (* PJRT_Buffer* const* const* *)
+        let num_devices = field t "num_devices" size_t
+        let num_args = field t "num_args" size_t
+        let output_lists = field t "output_lists" @@ ptr (ptr (ptr buffer))
 
         (* PJRT_Buffer** const* output_lists;  in/out *)
-        let device_complete_events = field t_args "device_complete_events" @@ ptr (ptr event) (* in/out *)
-        let execute_device = field t_args "execute_device" @@ ptr device
-        let () = seal t_args
+        let device_complete_events = field t "device_complete_events" @@ ptr (ptr event) (* in/out *)
+        let execute_device = field t "execute_device" @@ ptr device
+        let () = seal t
       end
 
-      let api = typedef (static_funptr (ptr Args.t_args @-> returning error)) @@ _NS "LoadedExecutable_Execute"
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Execute"
     end
 
     module Fingerprint = struct

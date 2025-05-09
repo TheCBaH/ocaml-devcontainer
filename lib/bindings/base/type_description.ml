@@ -15,9 +15,13 @@ module Base (F : Cstubs.Types.TYPE) = struct
     let name = _NS name in
     (name, structure name)
 
-  let make_struct name =
+  let make_struct_traits name =
     let name, t = make_struct_base name in
     let size = constant (name ^ "_STRUCT_SIZE") size_t in
+    (name, size, t)
+
+  let make_struct name =
+    let name, size, t = make_struct_traits name in
     let struct_size = field t "struct_size" size_t in
     (struct_size, size, typedef t name)
 
@@ -45,6 +49,7 @@ module Base (F : Cstubs.Types.TYPE) = struct
   let buffer : [ `Buffer ] structure typ = snd @@ make_struct_base "Buffer"
   let executeContext : [ `ExecuteContext ] structure typ = snd @@ make_struct_base "ExecuteContext"
   let program : [ `Program ] structure typ = snd @@ make_struct_base "Program"
+  let copyToDeviceStream : [ `CopyToDeviceStream ] structure typ = snd @@ make_struct_base "CopyToDeviceStream"
 
   (*
   let chunk_deleter_fun = static_funptr (ptr void @-> ptr void @-> returning void)
