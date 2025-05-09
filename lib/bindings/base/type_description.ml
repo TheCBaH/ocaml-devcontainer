@@ -59,8 +59,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
   (* ------------------------------- Extensions ---------------------------------- *)
 
-  let extension_type = make_enum "Extension_Type" Types.Extension_Type.values
-  let bufferType = make_enum "Buffer_Type" Types.Buffer_Type.values
+  let extensionType = make_enum "Extension_Type" Types.Extension_Type.values
 
   (* PJRT_Extension_Base contains a type and a pointer to next
      PJRT_Extension_Base. The framework can go through this chain to find an
@@ -69,7 +68,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
     type t = [ `Extension_Base ]
 
     let struct_size, size, (t : t structure typ) = make_struct "Extension_Base"
-    let type_ = field t "type" extension_type
+    let type_ = field t "type" extensionType
     let next = field t "next" @@ ptr t
     let () = seal t
   end
