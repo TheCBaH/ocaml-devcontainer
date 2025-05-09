@@ -328,4 +328,352 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "ExecuteContext_Destroy"
     end
   end
+
+  module Executable = struct
+    let serializedExecutable : [ `SerializedExecutable ] structure typ = snd @@ make_struct_base "SerializedExecutable"
+
+    module Destroy = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_Destroy_Args"
+        let executable = field t "executable" @@ ptr executable
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Destroy"
+    end
+
+    module Name = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_Name_Args"
+        let executable = field t "executable" @@ ptr executable
+        let executable_name = field t "executable_name" string (* out *)
+        let executable_name_size = field t "executable_name_size" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Name"
+    end
+
+    module NumReplicas = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_NumReplicas_Args"
+        let executable = field t "executable" @@ ptr executable
+        let num_replicas = field t "num_replicas" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_NumReplicas"
+    end
+
+    module NumPartitions = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_NumPartitions_Args"
+        let executable = field t "executable" @@ ptr executable
+        let num_partitions = field t "num_partitions" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_NumPartitions"
+    end
+
+    module OptimizedProgram = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_OptimizedProgram_Args"
+        let executable = field t "executable" @@ ptr executable
+        let program = field t "program" @@ ptr program (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OptimizedProgram"
+    end
+
+    module NumOutputs = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_NumOutputs_Args"
+        let executable = field t "executable" @@ ptr executable
+        let num_outputs = field t "num_outputs" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_NumOutputs"
+    end
+
+    module SizeOfGeneratedCodeInBytes = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "Executable_SizeOfGeneratedCodeInBytes_Args"
+
+        let executable = field t "executable" @@ ptr executable
+        let size_in_bytes = field t "size_in_bytes" int64_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_SizeOfGeneratedCodeInBytes"
+    end
+
+    module Fingerprint = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_Fingerprint_Args"
+        let executable = field t "executable" @@ ptr executable
+        let executable_fingerprint = field t "executable_fingerprint" string (* out *)
+        let executable_fingerprint_size = field t "executable_fingerprint_size" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Fingerprint"
+    end
+
+    module GetCostAnalysis = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_GetCostAnalysis_Args"
+        let executable = field t "executable" @@ ptr executable
+        let num_properties = field t "num_properties" size_t (* out *)
+        let properties = field t "properties" @@ ptr (const namedValue) (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_GetCostAnalysis"
+    end
+
+    module GetCompiledMemoryStats = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "Executable_GetCompiledMemoryStats_Args"
+
+        let executable = field t "executable" @@ ptr executable
+        let generated_code_size_in_bytes = field t "generated_code_size_in_bytes" int64_t (* out *)
+        let argument_size_in_bytes = field t "argument_size_in_bytes" int64_t (* out *)
+        let output_size_in_bytes = field t "output_size_in_bytes" int64_t (* out *)
+        let alias_size_in_bytes = field t "alias_size_in_bytes" int64_t (* out *)
+        let temp_size_in_bytes = field t "temp_size_in_bytes" int64_t (* out *)
+        let host_generated_code_size_in_bytes = field t "host_generated_code_size_in_bytes" int64_t (* out *)
+        let host_argument_size_in_bytes = field t "host_argument_size_in_bytes" int64_t (* out *)
+        let host_output_size_in_bytes = field t "host_output_size_in_bytes" int64_t (* out *)
+        let host_alias_size_in_bytes = field t "host_alias_size_in_bytes" int64_t (* out *)
+        let host_temp_size_in_bytes = field t "host_temp_size_in_bytes" int64_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_GetCompiledMemoryStats"
+    end
+
+    module OutputElementTypes = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_OutputElementTypes_Args"
+        let executable = field t "executable" @@ ptr executable
+        let output_types = field t "output_types" @@ ptr uint
+
+        (* should be bufferType *)
+        (* out - PJRT_Buffer_Type* *)
+        let num_output_types = field t "num_output_types" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OutputElementTypes"
+    end
+
+    module OutputDimensions = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_OutputDimensions_Args"
+        let executable = field t "executable" @@ ptr executable
+        let num_outputs = field t "num_outputs" size_t (* in *)
+        let dims = field t "dims" @@ ptr (const int64_t) (* out *)
+        let dim_sizes = field t "dim_sizes" @@ ptr (const size_t) (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OutputDimensions"
+    end
+
+    module OutputMemoryKinds = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_OutputMemoryKinds_Args"
+        let executable = field t "executable" @@ ptr executable
+        let num_outputs = field t "num_outputs" size_t (* in *)
+        let memory_kinds = field t "memory_kinds" @@ ptr (ptr (const char)) (* out const char* const* *)
+        let memory_kind_sizes = field t "memory_kind_sizes" @@ ptr (const size_t) (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_OutputMemoryKinds"
+    end
+
+    module Serialize = struct
+      let deleter = static_funptr (ptr serializedExecutable @-> returning void)
+
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_Serialize_Args"
+        let executable = field t "executable" @@ ptr (const executable) (* C API is const PJRT_Executable* *)
+        let serialized_bytes = field t "serialized_bytes" string (* out const char* *)
+        let serialized_bytes_size = field t "serialized_bytes_size" size_t (* out *)
+
+        let serialized_executable =
+          field t "serialized_executable" @@ ptr serializedExecutable (* out PJRT_SerializedExecutable* *)
+
+        let serialized_executable_deleter = field t "serialized_executable_deleter" deleter (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_Serialize"
+    end
+
+    (* PJRT_Executable_DeserializeAndLoad is more related to client, might move later *)
+    module DeserializeAndLoad = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_DeserializeAndLoad_Args"
+        let client = field t "client" @@ ptr client
+        let serialized_executable = field t "serialized_executable" string
+        let serialized_executable_size = field t "serialized_executable_size" size_t
+        let loaded_executable = field t "loaded_executable" @@ ptr loadedExecutable (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Executable_DeserializeAndLoad"
+    end
+  end
+
+  module LoadedExecutable = struct
+    module Destroy = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "LoadedExecutable_Destroy_Args"
+        let executable = field t "executable" @@ ptr loadedExecutable
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Destroy"
+    end
+
+    module GetExecutable = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "LoadedExecutable_GetExecutable_Args"
+
+        let loaded_executable = field t "loaded_executable" @@ ptr loadedExecutable
+        let executable = field t "executable" @@ ptr executable (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_GetExecutable"
+    end
+
+    module AddressableDevices = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "LoadedExecutable_AddressableDevices_Args"
+
+        let executable = field t "executable" @@ ptr loadedExecutable
+        let addressable_devices = field t "addressable_devices" @@ ptr (ptr device) (* out *)
+        let num_addressable_devices = field t "num_addressable_devices" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_AddressableDevices"
+    end
+
+    module Delete = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "LoadedExecutable_Delete_Args"
+        let executable = field t "executable" @@ ptr loadedExecutable
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Delete"
+    end
+
+    module IsDeleted = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "LoadedExecutable_IsDeleted_Args"
+        let executable = field t "executable" @@ ptr loadedExecutable
+        let is_deleted = field t "is_deleted" bool (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_IsDeleted"
+    end
+
+    module Execute = struct
+      module Options = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "ExecuteOptions"
+        let () = seal t
+      end
+
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t_args : t structure typ) = pjrt_struct "LoadedExecutable_Execute_Args"
+        let executable = field t_args "executable" @@ ptr executable
+        let options = field t_args "options" @@ ptr Options.t
+        let argument_lists = field t_args "argument_lists" @@ ptr (ptr (ptr buffer)) (* PJRT_Buffer* const* const* *)
+        let num_devices = field t_args "num_devices" size_t
+        let num_args = field t_args "num_args" size_t
+        let output_lists = field t_args "output_lists" @@ ptr (ptr (ptr buffer))
+
+        (* PJRT_Buffer** const* output_lists;  in/out *)
+        let device_complete_events = field t_args "device_complete_events" @@ ptr (ptr event) (* in/out *)
+        let execute_device = field t_args "execute_device" @@ ptr device
+        let () = seal t_args
+      end
+
+      let api = typedef (static_funptr (ptr Args.t_args @-> returning error)) @@ _NS "LoadedExecutable_Execute"
+    end
+
+    module Fingerprint = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "LoadedExecutable_Fingerprint_Args"
+
+        let executable =
+          field t "executable" @@ ptr loadedExecutable (* C struct uses 'executable' for PJRT_LoadedExecutable* *)
+
+        let executable_fingerprint = field t "executable_fingerprint" string (* out *)
+        let executable_fingerprint_size = field t "executable_fingerprint_size" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "LoadedExecutable_Fingerprint"
+    end
+  end
 end

@@ -44,6 +44,86 @@ module Base (F : Cstubs.Types.TYPE) = struct
   let loadedExecutable : [ `LoadedExecutable ] structure typ = snd @@ make_struct_base "LoadedExecutable"
   let buffer : [ `Buffer ] structure typ = snd @@ make_struct_base "Buffer"
   let executeContext : [ `ExecuteContext ] structure typ = snd @@ make_struct_base "ExecuteContext"
+  let program : [ `Program ] structure typ = snd @@ make_struct_base "Program"
+
+  (*
+  let chunk_deleter_fun = static_funptr (ptr void @-> ptr void @-> returning void)
+
+  module Chunk_fields = struct
+    type t
+
+    let t : t structure typ = structure (_NS "Chunk")
+    let data = field t "data" (ptr void)
+    let size = field t "size" size_t
+    let deleter = field t "deleter" chunk_deleter_fun
+    let deleter_arg = field t "deleter_arg" (ptr void)
+    let () = seal t
+  end
+
+  let chunk : Chunk_fields.t_struct structure typ = Chunk_fields.t
+  let copyToDeviceStream : [ `CopyToDeviceStream ] structure typ = snd @@ make_struct_base "CopyToDeviceStream"
+
+  let sendCallback =
+    typedef
+      (static_funptr (ptr chunk @-> ptr callbackError @-> size_t @-> bool @-> ptr void @-> returning error))
+      (_NS "SendCallback")
+
+  let recvCallback =
+    typedef (static_funptr (ptr copyToDeviceStream @-> ptr void @-> returning void)) (_NS "RecvCallback")
+
+  module SendCallbackInfo_fields = struct
+    type t_struct
+
+    let t : t_struct structure typ = structure (_NS "SendCallbackInfo")
+
+    (* This struct is defined with PJRT_DEFINE_STRUCT_TRAITS, so _STRUCT_SIZE is available,
+       but struct_size is not an actual field in the C struct.
+       Cstubs will still need the _STRUCT_SIZE constant. We ensure it's declared
+       by calling make_struct_base, but we only use the resulting type 't'.
+       The s_size_const from make_struct would be PJRT_SendCallbackInfo_STRUCT_SIZE. *)
+    let _ = make_struct_base "SendCallbackInfo" (* Ensures _STRUCT_SIZE is known by Cstubs *)
+    let channel_id = field t "channel_id" int64_t
+    let user_arg = field t "user_arg" (ptr void)
+    let send_callback = field t "send_callback" sendCallback
+    let () = seal t
+  end
+
+  let sendCallbackInfo : SendCallbackInfo_fields.t_struct structure typ = SendCallbackInfo_fields.t
+
+  module RecvCallbackInfo_fields = struct
+    type t_struct
+
+    let t : t_struct structure typ = structure (_NS "RecvCallbackInfo")
+    let _ = make_struct_base "RecvCallbackInfo" (* Ensures _STRUCT_SIZE is known by Cstubs *)
+    let channel_id = field t "channel_id" int64_t
+    let user_arg = field t "user_arg" (ptr void)
+    let recv_callback = field t "recv_callback" recvCallback
+    let () = seal t
+  end
+
+  let recvCallbackInfo : RecvCallbackInfo_fields.t_struct structure typ = RecvCallbackInfo_fields.t
+
+  module ExecuteOptions_fields = struct
+    type t_struct
+
+    let s_extension_start, s_struct_size, s_size_const, (struct_typ : t_struct structure typ) =
+      pjrt_struct "ExecuteOptions"
+
+    let send_callbacks = field struct_typ "send_callbacks" (ptr (ptr sendCallbackInfo))
+    let recv_callbacks = field struct_typ "recv_callbacks" (ptr (ptr recvCallbackInfo))
+    let num_send_ops = field struct_typ "num_send_ops" size_t
+    let num_recv_ops = field struct_typ "num_recv_ops" size_t
+    let launch_id = field struct_typ "launch_id" int
+    let non_donatable_input_indices = field struct_typ "non_donatable_input_indices" (ptr (const int64_t))
+    let num_non_donatable_input_indices = field struct_typ "num_non_donatable_input_indices" size_t
+    let context = field struct_typ "context" (ptr executeContext)
+    let () = seal struct_typ
+  end
+
+  let executeOptions : ExecuteOptions_fields.t_struct structure typ = ExecuteOptions_fields.struct_typ
+  let serializedExecutable : [ `SerializedExecutable ] structure typ = snd @@ make_struct_base "SerializedExecutable"
+  let serialized_executable_deleter_fun = static_funptr (ptr serializedExecutable @-> returning void)
+*)
 end
 
 module Types (F : Cstubs.Types.TYPE) = struct
@@ -53,6 +133,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
   (* ------------------------------- Extensions ---------------------------------- *)
 
   let extension_type = make_enum "Extension_Type" Types.Extension_Type.values
+  let bufferType = make_enum "Buffer_Type" Types.Buffer_Type.values
 
   (* PJRT_Extension_Base contains a type and a pointer to next
      PJRT_Extension_Base. The framework can go through this chain to find an
