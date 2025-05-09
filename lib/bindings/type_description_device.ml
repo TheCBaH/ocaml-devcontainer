@@ -216,4 +216,88 @@ module Types (F : Cstubs.Types.TYPE) = struct
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_MemoryStats"
     end
   end
+
+  module Memory = struct
+    module Id = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_Id_Args"
+        let memory = field t "memory" @@ ptr memory
+        let id = field t "id" int (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_Id"
+    end
+
+    module Kind = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_Kind_Args"
+        let memory = field t "memory" @@ ptr memory
+        let kind = field t "kind" string (* out *)
+        let kind_size = field t "kind_size" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_Kind"
+    end
+
+    module KindId = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_Kind_Id_Args"
+        let memory = field t "memory" @@ ptr memory
+        let kind_id = field t "kind_id" int (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_Kind_Id"
+    end
+
+    module DebugString = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_DebugString_Args"
+        let memory = field t "memory" @@ ptr memory
+        let debug_string = field t "debug_string" string (* out *)
+        let debug_string_size = field t "debug_string_size" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_DebugString"
+    end
+
+    module ToString = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_ToString_Args"
+        let memory = field t "memory" @@ ptr memory
+        let to_string = field t "to_string" string (* out *)
+        let to_string_size = field t "to_string_size" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_ToString"
+    end
+
+    module AddressableByDevices = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_AddressableByDevices_Args"
+        let memory = field t "memory" @@ ptr memory
+        let devices = field t "devices" @@ ptr (ptr device) (* out *)
+        let num_devices = field t "num_devices" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Memory_AddressableByDevices"
+    end
+  end
 end
