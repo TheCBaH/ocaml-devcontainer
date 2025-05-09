@@ -56,6 +56,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "DeviceDescription_Attributes_Args"
         let device_description = field t "device_description" @@ ptr deviceDescription
         let num_attributes = field t "num_attributes" size_t (* out *)
+
+        (* `attributes` has the lifetime of `device_description`. *)
         let attributes = field t "attributes" @@ ptr (const namedValue) (* out *)
         let () = seal t
       end
@@ -73,8 +75,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "DeviceDescription_Kind_Args"
         let device_description = field t "device_description" @@ ptr deviceDescription
 
-        (* `device_kind` string is owned by `device` and has same lifetime as
-           `device`. *)
+        (* `device_kind` string is owned by `device_description` and has same lifetime
+           as `device_description`. *)
         let device_kind = field t "device_kind" string (* out *)
         let device_kind_size = field t "device_kind_size" size_t (* out *)
         let () = seal t
@@ -91,6 +93,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "DeviceDescription_DebugString_Args"
         let device_description = field t "device_description" @@ ptr deviceDescription
+
+        (* `debug_string` has the lifetime of `device_description`. *)
         let debug_string = field t "debug_string" string (* out *)
         let debug_string_size = field t "debug_string_size" size_t (* out *)
         let () = seal t
@@ -108,6 +112,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "DeviceDescription_ToString_Args"
         let device_description = field t "device_description" @@ ptr deviceDescription
+
+        (* `to_string` has the lifetime of `device_description`. *)
         let to_string = field t "to_string" string (* out *)
         let to_string_size = field t "to_string_size" size_t (* out *)
         let () = seal t
@@ -119,6 +125,11 @@ module Types (F : Cstubs.Types.TYPE) = struct
     end
   end
 
+  (* PJRT_Device is an opaque, PJRT implementation-specific type that represents a
+     device.
+
+     It is the responsibility of the plugin to manage the memory for this struct.
+     PJRT_Device structs are not owned by the client. *)
   module Device = struct
     module GetDescription = struct
       module Args = struct
@@ -126,10 +137,14 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_GetDescription_Args"
         let device = field t "device" @@ ptr device
+
+        (* The returned `device_description` is owned by and has the same lifetime as
+           `device`. *)
         let device_description = field t "device_description" @@ ptr (const deviceDescription) (* out *)
         let () = seal t
       end
 
+      (* Returns a PJRT_DeviceDescription that describes `device`. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_GetDescription"
     end
 
@@ -143,6 +158,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Whether client can issue commands to this device. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_IsAddressable"
     end
 
@@ -152,10 +168,15 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_LocalHardwareId_Args"
         let device = field t "device" @@ ptr device
+
+        (* Opaque hardware ID, e.g. the CUDA device number. In general, not guaranteed
+           to be dense, and -1 if invalid. *)
         let local_hardware_id = field t "local_hardware_id" int (* out *)
         let () = seal t
       end
 
+      (* An opaque ID that can be used to compare with the `local_hardware_id` in
+         `PJRT_DeviceDescription`. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_LocalHardwareId"
     end
 
@@ -165,11 +186,14 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_AddressableMemories_Args"
         let device = field t "device" @@ ptr device
+
+        (* `memories` has the lifetime of `device`. *)
         let memories = field t "memories" @@ ptr (ptr memory) (* out *)
         let num_memories = field t "num_memories" size_t (* out *)
         let () = seal t
       end
 
+      (* Returns all memories that are addressable from `device`. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_AddressableMemories"
     end
 
@@ -179,47 +203,83 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_DefaultMemory_Args"
         let device = field t "device" @@ ptr device
+
+        (* `memory` has the lifetime of `device`. *)
         let memory = field t "memory" @@ ptr memory (* out *)
         let () = seal t
       end
 
+      (* Returns the default memory for a device. This memory is addressable from
+         `device`. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_DefaultMemory"
     end
 
     module MemoryStats = struct
+      (* All PJRT_Device_MemoryStats_Args `*_is_set` fields are true if the
+         corresponding stat is available from the plugin, and false otherwise.
+
+         All byte counts are in bytes. *)
       module Args = struct
         type t
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_MemoryStats_Args"
         let device = field t "device" @@ ptr device
+
+        (* Current bytes in use by the program. *)
         let bytes_in_use = field t "bytes_in_use" int64_t (* out *)
+
+        (* Peak bytes in use by the program. *)
         let peak_bytes_in_use = field t "peak_bytes_in_use" int64_t (* out *)
         let peak_bytes_in_use_is_set = field t "peak_bytes_in_use_is_set" bool (* out *)
+
+        (* Number of allocations by the program. *)
         let num_allocs = field t "num_allocs" int64_t (* out *)
         let num_allocs_is_set = field t "num_allocs_is_set" bool (* out *)
+
+        (* Largest allocation by the program. *)
         let largest_alloc_size = field t "largest_alloc_size" int64_t (* out *)
         let largest_alloc_size_is_set = field t "largest_alloc_size_is_set" bool (* out *)
+
+        (* The memory limit of the device. *)
         let bytes_limit = field t "bytes_limit" int64_t (* out *)
         let bytes_limit_is_set = field t "bytes_limit_is_set" bool (* out *)
+
+        (* Current bytes reserved by the program. *)
         let bytes_reserved = field t "bytes_reserved" int64_t (* out *)
         let bytes_reserved_is_set = field t "bytes_reserved_is_set" bool (* out *)
+
+        (* Peak bytes reserved by the program. *)
         let peak_bytes_reserved = field t "peak_bytes_reserved" int64_t (* out *)
         let peak_bytes_reserved_is_set = field t "peak_bytes_reserved_is_set" bool (* out *)
+
+        (* The reservable memory limit of the device. *)
         let bytes_reservable_limit = field t "bytes_reservable_limit" int64_t (* out *)
         let bytes_reservable_limit_is_set = field t "bytes_reservable_limit_is_set" bool (* out *)
+
+        (* Largest free block in the memory. *)
         let largest_free_block_bytes = field t "largest_free_block_bytes" int64_t (* out *)
         let largest_free_block_bytes_is_set = field t "largest_free_block_bytes_is_set" bool (* out *)
+
+        (* Current bytes in the memory pool. *)
         let pool_bytes = field t "pool_bytes" int64_t (* out *)
         let pool_bytes_is_set = field t "pool_bytes_is_set" bool (* out *)
+
+        (* Peak bytes in the memory pool. *)
         let peak_pool_bytes = field t "peak_pool_bytes" int64_t (* out *)
         let peak_pool_bytes_is_set = field t "peak_pool_bytes_is_set" bool (* out *)
         let () = seal t
       end
 
+      (* Gets memory statistics for `device`. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Device_MemoryStats"
     end
   end
 
+  (* PJRT_Memory is an opaque, PJRT implementation-specific type that represents a
+     memory space.
+
+     It is the responsibility of the plugin to manage the memory for this struct.
+     PJRT_Memory structs are not owned by the client. *)
   module Memory = struct
     module Id = struct
       module Args = struct
@@ -231,6 +291,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* The ID of this memory. IDs are unique among memories of this type. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_Id"
     end
 
@@ -240,11 +301,14 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_Kind_Args"
         let memory = field t "memory" @@ ptr memory
+
+        (* `kind` has the lifetime of `memory`. *)
         let kind = field t "kind" string (* out *)
         let kind_size = field t "kind_size" size_t (* out *)
         let () = seal t
       end
 
+      (* A platform-dependent string that identifies the kind of the memory. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_Kind"
     end
 
@@ -258,6 +322,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* A platform-dependent ID that identifies the kind of the memory. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_Kind_Id"
     end
 
@@ -267,11 +332,15 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_DebugString_Args"
         let memory = field t "memory" @@ ptr memory
+
+        (* `debug_string` has the lifetime of `memory`. *)
         let debug_string = field t "debug_string" string (* out *)
         let debug_string_size = field t "debug_string_size" size_t (* out *)
         let () = seal t
       end
 
+      (* Debug string suitable for logging when errors occur. Should be verbose enough
+         to identify the exact memory, e.g., its complete name. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_DebugString"
     end
 
@@ -281,11 +350,14 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_ToString_Args"
         let memory = field t "memory" @@ ptr memory
+
+        (* `to_string` has the lifetime of `memory`. *)
         let to_string = field t "to_string" string (* out *)
         let to_string_size = field t "to_string_size" size_t (* out *)
         let () = seal t
       end
 
+      (* Debug string suitable for reading by end users, should be reasonably terse. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_ToString"
     end
 
@@ -295,11 +367,14 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Memory_AddressableByDevices_Args"
         let memory = field t "memory" @@ ptr memory
+
+        (* `devices` has the lifetime of `memory`. *)
         let devices = field t "devices" @@ ptr (ptr device) (* out *)
         let num_devices = field t "num_devices" size_t (* out *)
         let () = seal t
       end
 
+      (* Returns all devices that can address `memory`. *)
       let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Memory_AddressableByDevices"
     end
   end
