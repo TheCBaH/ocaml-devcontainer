@@ -58,7 +58,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
      optional tilings (each tile is a list of dimensions), or (2) a list of
      strides. *)
   module Buffer_MemoryLayout = struct
-    type t = [ `Buffer_MemoryLayout ]
+    type t = [ `BufferMemoryLayout ]
 
     let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_MemoryLayout"
     let tiled = field t "tiled" bufferMemoryLayoutTiled

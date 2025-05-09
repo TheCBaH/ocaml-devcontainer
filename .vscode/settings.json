@@ -29,6 +29,7 @@
         "progn",
         "stablehlo",
         "toplevel",
+        "unpadded",
         "utop"
     ],
     "explorer.excludeGitIgnore": true

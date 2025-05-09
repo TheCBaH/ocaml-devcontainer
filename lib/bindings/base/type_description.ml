@@ -50,6 +50,7 @@ module Base (F : Cstubs.Types.TYPE) = struct
   let executeContext : [ `ExecuteContext ] structure typ = snd @@ make_struct_base "ExecuteContext"
   let program : [ `Program ] structure typ = snd @@ make_struct_base "Program"
   let copyToDeviceStream : [ `CopyToDeviceStream ] structure typ = snd @@ make_struct_base "CopyToDeviceStream"
+  let bufferMemoryLayout : [ `BufferMemoryLayout ] structure typ = snd @@ make_struct_base "Buffer_MemoryLayout"
 end
 
 module Types (F : Cstubs.Types.TYPE) = struct

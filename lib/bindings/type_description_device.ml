@@ -778,4 +778,293 @@ module Types (F : Cstubs.Types.TYPE) = struct
         typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_Fingerprint"
     end
   end
+
+  module Buffer = struct
+    module Destroy = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_Destroy_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_Destroy"
+    end
+
+    module ElementType = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_ElementType_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let type_ = field t "type" uint
+
+        (* should be bufferType *)
+        (* out - PJRT_Buffer_Type* *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_ElementType"
+    end
+
+    module Dimensions = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_Dimensions_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let dims = field t "dims" @@ ptr int64_t (* out *)
+        let num_dims = field t "num_dims" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_Dimensions"
+    end
+
+    module UnpaddedDimensions = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_UnpaddedDimensions_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let unpadded_dims = field t "unpadded_dims" @@ ptr int64_t (* out *)
+        let num_dims = field t "num_dims" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_UnpaddedDimensions"
+    end
+
+    module DynamicDimensionIndices = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "Buffer_DynamicDimensionIndices_Args"
+
+        let buffer = field t "buffer" @@ ptr buffer
+        let dynamic_dim_indices = field t "dynamic_dim_indices" @@ ptr @@ const size_t (* out *)
+        let num_dynamic_dims = field t "num_dynamic_dims" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_DynamicDimensionIndices"
+    end
+
+    module GetMemoryLayout = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_GetMemoryLayout_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let layout = field t "layout" @@ ptr bufferMemoryLayout (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_GetMemoryLayout"
+    end
+
+    module ToHostBuffer = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_ToHostBuffer_Args"
+        let src = field t "src" @@ ptr buffer
+        let dst = field t "dst" @@ ptr void
+        let dst_size = field t "dst_size" size_t
+        let event = field t "event" @@ ptr event (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_ToHostBuffer"
+    end
+
+    module OnDeviceSizeInBytes = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_OnDeviceSizeInBytes_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let on_device_size_in_bytes = field t "on_device_size_in_bytes" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_OnDeviceSizeInBytes"
+    end
+
+    module Delete = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_Delete_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_Delete"
+    end
+
+    module IsDeleted = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_IsDeleted_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let is_deleted = field t "is_deleted" bool (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_IsDeleted"
+    end
+
+    module CopyRawToHost = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_CopyRawToHost_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let dst = field t "dst" @@ ptr void
+        let offset = field t "offset" int64_t
+        let transfer_size = field t "transfer_size" @@ ptr event (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_CopyRawToHost"
+    end
+
+    module CopyToDevice = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_CopyToDevice_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let dst_device = field t "dst_device" @@ ptr device
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_CopyToDevice"
+    end
+
+    module CopyToMemory = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_CopyToMemory_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let dst_memory = field t "dst_memory" @@ ptr memory
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_CopyToMemory"
+    end
+
+    module IsOnCpu = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_IsOnCpu_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let is_on_cpu = field t "is_on_cpu" bool (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_IsOnCpu"
+    end
+
+    module Device = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_Device_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let device = field t "device" @@ ptr device (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_Device"
+    end
+
+    module Memory = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_Memory_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let memory = field t "memory" @@ ptr memory (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_Memory"
+    end
+
+    module ReadyEvent = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_ReadyEvent_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let event = field t "event" @@ ptr event (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_ReadyEvent"
+    end
+
+    module UnsafePointer = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Buffer_UnsafePointer_Args"
+        let buffer = field t "buffer" @@ ptr buffer
+        let buffer_pointer = field t "buffer_pointer" @@ ptr void (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_UnsafePointer"
+    end
+
+    module IncreaseExternalReferenceCount = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "Buffer_IncreaseExternalReferenceCount_Args"
+
+        let buffer = field t "buffer" @@ ptr buffer
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_IncreaseExternalReferenceCount"
+    end
+
+    module DecreaseExternalReferenceCount = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "Buffer_DecreaseExternalReferenceCount_Args"
+
+        let buffer = field t "buffer" @@ ptr buffer
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_DecreaseExternalReferenceCount"
+    end
+
+    module OpaqueDeviceMemoryDataPointer = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "Buffer_OpaqueDeviceMemoryDataPointer_Args"
+
+        let buffer = field t "buffer" @@ ptr buffer
+        let device_memory_ptr = field t "device_memory_ptr" @@ ptr void (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Buffer_OpaqueDeviceMemoryDataPointer"
+    end
+  end
 end
