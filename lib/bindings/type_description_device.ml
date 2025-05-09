@@ -6,7 +6,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
   open F
 
   module DeviceDescription = struct
-  (* Device descriptions may be associated with an actual device
+    (* Device descriptions may be associated with an actual device
      (via PJRT_Device_GetDescription), but they can also be used to describe a
      device that isn't currently available to the plugin. This is useful for
      compiling executables without hardware available, which can then be
@@ -113,6 +113,107 @@ module Types (F : Cstubs.Types.TYPE) = struct
       (* Debug string suitable for reading by end users, should be reasonably terse,
          for example: "CpuDevice(id=0)". *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "DeviceDescription_ToString"
+    end
+  end
+
+  module Device = struct
+    module GetDescription = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_GetDescription_Args"
+        let device = field t "device" @@ ptr device
+        let device_description = field t "device_description" @@ ptr (const deviceDescription) (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_GetDescription"
+    end
+
+    module IsAddressable = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_IsAddressable_Args"
+        let device = field t "device" @@ ptr device
+        let is_addressable = field t "is_addressable" bool (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_IsAddressable"
+    end
+
+    module LocalHardwareId = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_LocalHardwareId_Args"
+        let device = field t "device" @@ ptr device
+        let local_hardware_id = field t "local_hardware_id" int (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_LocalHardwareId"
+    end
+
+    module AddressableMemories = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_AddressableMemories_Args"
+        let device = field t "device" @@ ptr device
+        let memories = field t "memories" @@ ptr (ptr memory) (* out *)
+        let num_memories = field t "num_memories" size_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_AddressableMemories"
+    end
+
+    module DefaultMemory = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_DefaultMemory_Args"
+        let device = field t "device" @@ ptr device
+        let memory = field t "memory" @@ ptr memory (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_DefaultMemory"
+    end
+
+    module MemoryStats = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Device_MemoryStats_Args"
+        let device = field t "device" @@ ptr device
+        let bytes_in_use = field t "bytes_in_use" int64_t (* out *)
+        let peak_bytes_in_use = field t "peak_bytes_in_use" int64_t (* out *)
+        let peak_bytes_in_use_is_set = field t "peak_bytes_in_use_is_set" bool (* out *)
+        let num_allocs = field t "num_allocs" int64_t (* out *)
+        let num_allocs_is_set = field t "num_allocs_is_set" bool (* out *)
+        let largest_alloc_size = field t "largest_alloc_size" int64_t (* out *)
+        let largest_alloc_size_is_set = field t "largest_alloc_size_is_set" bool (* out *)
+        let bytes_limit = field t "bytes_limit" int64_t (* out *)
+        let bytes_limit_is_set = field t "bytes_limit_is_set" bool (* out *)
+        let bytes_reserved = field t "bytes_reserved" int64_t (* out *)
+        let bytes_reserved_is_set = field t "bytes_reserved_is_set" bool (* out *)
+        let peak_bytes_reserved = field t "peak_bytes_reserved" int64_t (* out *)
+        let peak_bytes_reserved_is_set = field t "peak_bytes_reserved_is_set" bool (* out *)
+        let bytes_reservable_limit = field t "bytes_reservable_limit" int64_t (* out *)
+        let bytes_reservable_limit_is_set = field t "bytes_reservable_limit_is_set" bool (* out *)
+        let largest_free_block_bytes = field t "largest_free_block_bytes" int64_t (* out *)
+        let largest_free_block_bytes_is_set = field t "largest_free_block_bytes_is_set" bool (* out *)
+        let pool_bytes = field t "pool_bytes" int64_t (* out *)
+        let pool_bytes_is_set = field t "pool_bytes_is_set" bool (* out *)
+        let peak_pool_bytes = field t "peak_pool_bytes" int64_t (* out *)
+        let peak_pool_bytes_is_set = field t "peak_pool_bytes_is_set" bool (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Device_MemoryStats"
     end
   end
 end
