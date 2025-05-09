@@ -40,6 +40,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
   include Type_description_events.Types (F)
   include Type_description_client.Types (F)
+  include Type_description_device.Types (F)
 
   module Api = struct
     type t

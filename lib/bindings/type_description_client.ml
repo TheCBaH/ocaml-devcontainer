@@ -516,6 +516,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
          ready to use. This is intended to support dlpack on GPU and is not expected
          to be supported on all hardware platforms. *)
       let stream = field t "stream" intptr_t
+
+      (* Output buffer. The caller is responsible for calling PJRT_Buffer_Destroy. *)
       let buffer = field t "buffer" @@ ptr buffer (* out *)
 
       (* The memory space that `device_buffer_ptr` is in. *)
