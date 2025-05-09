@@ -665,8 +665,27 @@ module Types (F : Cstubs.Types.TYPE) = struct
         type t
 
         let _, size, (t : t structure typ) = make_struct_traits "SendCallbackInfo"
+
+        (* Used to associate this callback with the correct send op. *)
         let channel_id = field t "channel_id" int64_t
+
+        (*  Will be passed to `send_callback` as `user_arg` argument. *)
         let user_arg = field t "user_arg" @@ ptr void
+        let send_callback = field t "send_callback" sendCallback
+        let () = seal t
+      end
+
+      module RecvCallbackInfo = struct
+        type t
+
+        let _, size, (t : t structure typ) = make_struct_traits "RecvCallbackInfo"
+
+        (* Used to associate this callback with the correct recv op. *)
+        let channel_id = field t "channel_id" int64_t
+
+        (*  Will be passed to `recv_callback` as `user_arg` argument. *)
+        let user_arg = field t "user_arg" @@ ptr void
+        let recv_callback = field t "recv_callback" recvCallback
         let () = seal t
       end
 
