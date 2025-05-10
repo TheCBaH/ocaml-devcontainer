@@ -43,7 +43,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
   include Type_description_device.Types (F)
   include Type_description_events.Types (F)
 
-  (*
   (* ------------------------------- Version ---------------------------------- *)
   (* The plugin should set the major_version and minor_version of
      PJRT_Api.pjrt_api_version to be the `PJRT_API_MAJOR` and `PJRT_API_MINOR` in
@@ -176,12 +175,11 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Compile"
   end
   *)
-  *)
+  (*
   module Api = struct
     type t
 
     let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Api"
-    (*
 
     let api_version_field = field t "pjrt_api_version" Version.t
 
@@ -191,7 +189,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     let pluginInitialize = field t "PJRT_Plugin_Initialize" (ptr Plugin.Initialize.api)
     *)
-    (*
+  (*
     let pJRT_Plugin_Attributes = field _struct "PJRT_Plugin_Attributes" (ptr Plugin.Attributes.api)
 
     let pJRT_Event_Destroy = field _struct "PJRT_Event_Destroy" (ptr Event.Destroy.api)
@@ -313,13 +311,13 @@ module Types (F : Cstubs.Types.TYPE) = struct
     (* Assuming Client.DmaMap.api and Client.DmaUnmap.api are defined in type_description_client.ml *)
     let pJRT_Client_DmaMap = field _struct "PJRT_Client_DmaMap" (ptr Client.DmaMap.api)
     let pJRT_Client_DmaUnmap = field _struct "PJRT_Client_DmaUnmap" (ptr Client.DmaUnmap.api)
-    *)
 
     let () = seal t
     let const_t = ptr @@ const t
   end
+    *)
 
-  let init = typedef (static_funptr (void @-> returning Api.t)) @@ ns "init"
+  let init = typedef (static_funptr (void @-> returning void (* Api.t *))) @@ ns "init"
 
   module Dl = struct
     type t
