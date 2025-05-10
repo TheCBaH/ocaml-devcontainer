@@ -918,6 +918,151 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       (* Returns the amount of data the stream currently has either transferred or has
          buffered to transfer. *)
+      module TopologyDescription = struct
+        let serializedTopology : [ `SerializedTopology ] structure typ = snd @@ make_struct_base "SerializedTopology"
+
+        module Create = struct
+          module Args = struct
+            type t
+
+            let extension_start, struct_size, size, (t : t structure typ) =
+              pjrt_struct "TopologyDescription_Create_Args"
+
+            let topology_name = field t "topology_name" string
+            let topology_name_size = field t "topology_name_size" size_t
+            let create_options = field t "create_options" @@ ptr (const namedValue)
+            let num_options = field t "num_options" size_t
+            let topology = field t "topology" @@ ptr topologyDescription (* out *)
+            let () = seal t
+          end
+
+          (* Creates and initializes a new PJRT_TopologyDescription and returns in `topology`. *)
+          let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "TopologyDescription_Create"
+        end
+
+        module Destroy = struct
+          module Args = struct
+            type t
+
+            let extension_start, struct_size, size, (t : t structure typ) =
+              pjrt_struct "TopologyDescription_Destroy_Args"
+
+            let topology = field t "topology" @@ ptr topologyDescription
+            let () = seal t
+          end
+
+          (* Frees `topology`. `topology` can be nullptr. *)
+          let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "TopologyDescription_Destroy"
+        end
+
+        module PlatformVersion = struct
+          module Args = struct
+            type t
+
+            let extension_start, struct_size, size, (t : t structure typ) =
+              pjrt_struct "TopologyDescription_PlatformVersion_Args"
+
+            let topology = field t "topology" @@ ptr topologyDescription
+
+            (* `platform_version` has the same lifetime as `topology`. It's owned by `topology`. *)
+            let platform_version = field t "platform_version" string (* out *)
+            let platform_version_size = field t "platform_version_size" size_t (* out *)
+            let () = seal t
+          end
+
+          (* Returns a string containing human-readable, platform-specific version info
+         (e.g. the CUDA version on GPU or libtpu version on Cloud TPU). *)
+          let api =
+            typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "TopologyDescription_PlatformVersion"
+        end
+
+        module PlatformName = struct
+          module Args = struct
+            type t
+
+            let extension_start, struct_size, size, (t : t structure typ) =
+              pjrt_struct "TopologyDescription_PlatformName_Args"
+
+            let topology = field t "topology" @@ ptr (const topologyDescription)
+
+            (* `platform_name` has the same lifetime as `topology`. It is owned by `topology`. *)
+            let platform_name = field t "platform_name" string (* out *)
+            let platform_name_size = field t "platform_name_size" size_t (* out *)
+            let () = seal t
+          end
+
+          (* Returns a string that identifies the platform (e.g. "cpu", "gpu", "tpu"). *)
+          let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "TopologyDescription_PlatformName"
+        end
+
+        module GetDeviceDescriptions = struct
+          module Args = struct
+            type t
+
+            let extension_start, struct_size, size, (t : t structure typ) =
+              pjrt_struct "TopologyDescription_GetDeviceDescriptions_Args"
+
+            let topology = field t "topology" @@ ptr (const topologyDescription)
+
+            (* Has the same lifetime as topology. *)
+            let descriptions = field t "descriptions" @@ ptr (ptr (const deviceDescription)) (* out *)
+            let num_descriptions = field t "num_descriptions" size_t (* out *)
+            let () = seal t
+          end
+
+          (* Returns descriptions for all devices in this topology. The device
+         descriptions can be returned in any order, but will be in the same order
+         across calls within a process. *)
+          let api =
+            typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "TopologyDescription_GetDeviceDescriptions"
+        end
+
+        module Serialize = struct
+          module Args = struct
+            type t
+
+            let extension_start, struct_size, size, (t : t structure typ) =
+              pjrt_struct "TopologyDescription_Serialize_Args"
+
+            let topology = field t "topology" @@ ptr topologyDescription
+
+            (* Lives only as long as serialized_topology. *)
+            let serialized_bytes = field t "serialized_bytes" string (* out *)
+            let serialized_bytes_size = field t "serialized_bytes_size" size_t (* out *)
+            let serialized_topology = field t "serialized_topology" @@ ptr serializedTopology (* out *)
+
+            (* Must be called exactly once to free the backing memory for serialized_bytes. *)
+            let serialized_topology_deleter =
+              field t "serialized_topology_deleter" @@ static_funptr (ptr serializedTopology @-> returning void)
+            (* out *)
+
+            let () = seal t
+          end
+
+          (* Serializes the TopologyDescription to a string for use in cache keys. *)
+          let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "TopologyDescription_Serialize"
+        end
+
+        module Attributes = struct
+          module Args = struct
+            type t
+
+            let extension_start, struct_size, size, (t : t structure typ) =
+              pjrt_struct "TopologyDescription_Attributes_Args"
+
+            let topology = field t "topology" @@ ptr topologyDescription
+
+            (* Only lives as long as topology. *)
+            let attributes = field t "attributes" @@ ptr (const namedValue) (* out *)
+            let num_attributes = field t "num_attributes" size_t (* out *)
+            let () = seal t
+          end
+
+          (* Returns platform-specific topology attributes. *)
+          let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "TopologyDescription_Attributes"
+        end
+      end
+
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_CurrentBytes"
     end
   end
