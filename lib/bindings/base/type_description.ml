@@ -75,44 +75,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
   let pjrt_struct name = pjrt_struct name
 
-  (* ------------------------------- Version ---------------------------------- *)
-  module Version = struct
-    (* Incremented when an ABI-incompatible change is made to the interface.
-       Changes include:
-       * Deleting a method or argument
-       * Changing the type of an argument
-       * Rearranging fields in the PJRT_Api or argument structs *)
-    let major = constant (_NS "API_MAJOR") int
-
-    (* Incremented when the interface is updated in a way that is potentially
-       ABI-compatible with older versions, if supported by the caller and/or
-       implementation.
-
-       Callers can implement forwards compatibility by using PJRT_Api_Version to
-       check if the implementation is aware of newer interface additions.
-
-       Implementations can implement backwards compatibility by using the
-       `struct_size` fields to detect how many struct fields the caller is aware of.
-
-       Changes include:
-       * Adding a new field to the PJRT_Api or argument structs
-       * Renaming a method or argument (doesn't affect ABI) *)
-    let minor = constant (_NS "API_MINOR") int
-
-    type t
-
-    let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Api_Version"
-
-    (* out *)
-    let major_version = field t "major_version" int
-
-    (* out *)
-    let minor_version = field t "minor_version" int
-    let () = seal t
-  end
-
-  let errorCode = make_enum "Error_Code" Types.Error_Code.values
-
   (* Function for PJRT implementation to pass to callback functions provided by
        caller so the callback can create a PJRT_Error* on error (to return to the
        implementation). `message` is only required to live for the
@@ -120,81 +82,11 @@ module Types (F : Cstubs.Types.TYPE) = struct
        `message` into the PJRT_Error. *)
   let callbackError =
     typedef
-      (static_funptr (errorCode (* code *) @-> string (* message *) @-> size_t (* message_size *) @-> returning error))
+      (static_funptr
+         (uint
+        (* should be  errorCode *)
+        (* code *) @-> string
+         (* message *) @-> size_t
+         (* message_size *) @-> returning error))
     @@ ns "CallbackError"
-
-  (*// ---------------------------------- Errors ----------------------------------- *)
-  (* PJRT C API methods generally return a PJRT_Error*, which is nullptr if there
-     is no error and set if there is. The implementation allocates any returned
-     PJRT_Errors, but the caller is always responsible for freeing them via
-     PJRT_Error_Destroy. *)
-  module Error = struct
-    module Destroy = struct
-      module Args = struct
-        type t
-
-        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Destroy_Args"
-        let error = field t "error" error
-        let () = seal t
-      end
-
-      (* Frees `error`. `error` can be nullptr. *)
-      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning void)) @@ _NS "Error_Destroy"
-    end
-
-    module Message = struct
-      module Args = struct
-        type t
-
-        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_Message_Args"
-        let error = field t "error" const_error
-
-        (* Has the lifetime of `error`. *)
-        let message = field t "message" string
-        let message_size = field t "message_size" size_t
-        let () = seal t
-      end
-
-      (* Gets the human-readable reason for `error`. `message` has the lifetime of
-       `error`. *)
-      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning void)) @@ _NS "Error_Message"
-    end
-
-    module GetCode = struct
-      module Args = struct
-        type t
-
-        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Error_GetCode_Args"
-        let error = field t "error" const_error
-
-        (* out *)
-        let code = field t "code" errorCode
-        let () = seal t
-      end
-
-      let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Error_GetCode"
-    end
-  end
-
-  let api_error = error
-  let namedValue = make_enum "NamedValue" ~suffix:"Type" Types.NamedValue.values
-
-  (* Named value for key-value pairs. *)
-  module NamedValue = struct
-    type t = [ `NamedValue ]
-
-    let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "NamedValue"
-    let name = field t "name" string
-    let name_size = field t "name_size" size_t
-    let type_ = field t "type" namedValue
-    let string_value = field t "string_value" string
-    let int64_value = field t "int64_value" int64_t
-    let int64_array_value = field t "int64_array_value" @@ ptr int64_t
-    let float_value = field t "float_value" int64_t
-    let bool_value = field t "bool_value" bool
-
-    (* `value_size` is the number of elements for array/string and 1 for scalar
-       values. *)
-    let value_size = field t "value_size" size_t
-  end
 end

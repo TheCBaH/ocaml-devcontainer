@@ -18,6 +18,7 @@
         "fpic",
         "funptr",
         "libpjrt",
+        "MLIR",
         "noninteractive",
         "nullptr",
         "ocamlformat",
