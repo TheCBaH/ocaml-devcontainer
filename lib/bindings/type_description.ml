@@ -165,130 +165,139 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let errorMessage = field t "PJRT_Error_Message" Error.Message.api
     let errorGetCode = field t "PJRT_Error_GetCode" Error.GetCode.api
     let pluginInitialize = field t "PJRT_Plugin_Initialize" Plugin.Initialize.api
+    let pluginAttributes = field t "PJRT_Plugin_Attributes" Plugin.Attributes.api
+    let eventDestroy = field t "PJRT_Event_Destroy" Event.Destroy.api
+    let eventIsReady = field t "PJRT_Event_IsReady" Event.IsReady.api
+    let eventError = field t "PJRT_Event_Error" Event.Error.api
+    let eventAwait = field t "PJRT_Event_Await" Event.Await.api
+    let eventOnReady = field t "PJRT_Event_OnReady" Event.OnReady.api
+    let clientCreate = field t "PJRT_Client_Create" Client.Create.api
+    let clientDestroy = field t "PJRT_Client_Destroy" Client.Destroy.api
+    let clientPlatformName = field t "PJRT_Client_PlatformName" Client.PlatformName.api
+    let clientProcessIndex = field t "PJRT_Client_ProcessIndex" Client.ProcessIndex.api
+    let clientPlatformVersion = field t "PJRT_Client_PlatformVersion" Client.PlatformVersion.api
+    let clientDevices = field t "PJRT_Client_Devices" Client.Devices.api
+    let clientAddressableDevices = field t "PJRT_Client_AddressableDevices" Client.AddressableDevices.api
+    let clientLookupDevice = field t "PJRT_Client_LookupDevice" Client.LookupDevice.api
+    let clientLookupAddressableDevice = field t "PJRT_Client_LookupAddressableDevice" Client.LookupAddressableDevice.api
+    let clientAddressableMemories = field t "PJRT_Client_AddressableMemories" Client.AddressableMemories.api
+    let clientCompile = field t "PJRT_Client_Compile" Client.Compile.api
+    let clientDefaultDeviceAssignment = field t "PJRT_Client_DefaultDeviceAssignment" Client.DefaultDeviceAssignment.api
+    let clientBufferFromHostBuffer = field t "PJRT_Client_BufferFromHostBuffer" BufferFromHostBuffer.api
+    let deviceDescriptionId = field t "PJRT_DeviceDescription_Id" DeviceDescription.Id.api
+    let deviceDescriptionProcessIndex = field t "PJRT_DeviceDescription_ProcessIndex" DeviceDescription.ProcessIndex.api
+    let deviceDescriptionAttributes = field t "PJRT_DeviceDescription_Attributes" DeviceDescription.Attributes.api
+    let deviceDescriptionKind = field t "PJRT_DeviceDescription_Kind" DeviceDescription.Kind.api
+    let deviceDescriptionDebugString = field t "PJRT_DeviceDescription_DebugString" DeviceDescription.DebugString.api
+    let deviceDescriptionToString = field t "PJRT_DeviceDescription_ToString" DeviceDescription.ToString.api
+    let deviceGetDescription = field t "PJRT_Device_GetDescription" Device.GetDescription.api
+    let deviceIsAddressable = field t "PJRT_Device_IsAddressable" Device.IsAddressable.api
+    let deviceLocalHardwareId = field t "PJRT_Device_LocalHardwareId" Device.LocalHardwareId.api
+    let deviceAddressableMemories = field t "PJRT_Device_AddressableMemories" Device.AddressableMemories.api
+    let deviceDefaultMemory = field t "PJRT_Device_DefaultMemory" Device.DefaultMemory.api
+    let deviceMemoryStats = field t "PJRT_Device_MemoryStats" Device.MemoryStats.api
+    let memoryId = field t "PJRT_Memory_Id" Memory.Id.api
+    let memoryKind = field t "PJRT_Memory_Kind" Memory.Kind.api
+    let memoryDebugString = field t "PJRT_Memory_DebugString" Memory.DebugString.api
+    let memoryToString = field t "PJRT_Memory_ToString" Memory.ToString.api
+    let memoryAddressableByDevices = field t "PJRT_Memory_AddressableByDevices" Memory.AddressableByDevices.api
+    let executableDestroy = field t "PJRT_Executable_Destroy" Executable.Destroy.api
+    let executableName = field t "PJRT_Executable_Name" Executable.Name.api
+    let executableNumReplicas = field t "PJRT_Executable_NumReplicas" Executable.NumReplicas.api
+    let executableNumPartitions = field t "PJRT_Executable_NumPartitions" Executable.NumPartitions.api
+    let executableNumOutputs = field t "PJRT_Executable_NumOutputs" Executable.NumOutputs.api
+
+    let executableSizeOfGeneratedCodeInBytes =
+      field t "PJRT_Executable_SizeOfGeneratedCodeInBytes" Executable.SizeOfGeneratedCodeInBytes.api
+
+    let executableGetCostAnalysis = field t "PJRT_Executable_GetCostAnalysis" Executable.GetCostAnalysis.api
+    let executableOutputMemoryKinds = field t "PJRT_Executable_OutputMemoryKinds" Executable.OutputMemoryKinds.api
+    let executableOptimizedProgram = field t "PJRT_Executable_OptimizedProgram" Executable.OptimizedProgram.api
+    let executableSerialize = field t "PJRT_Executable_Serialize" Executable.Serialize.api
+    let loadedExecutableDestroy = field t "PJRT_LoadedExecutable_Destroy" LoadedExecutable.Destroy.api
+    let loadedExecutableGetExecutable = field t "PJRT_LoadedExecutable_GetExecutable" LoadedExecutable.GetExecutable.api
+
+    let loadedExecutableAddressableDevices =
+      field t "PJRT_LoadedExecutable_AddressableDevices" LoadedExecutable.AddressableDevices.api
+
+    let loadedExecutableDelete = field t "PJRT_LoadedExecutable_Delete" LoadedExecutable.Delete.api
+    let loadedExecutableIsDeleted = field t "PJRT_LoadedExecutable_IsDeleted" LoadedExecutable.IsDeleted.api
+    let loadedExecutableExecute = field t "PJRT_LoadedExecutable_Execute" LoadedExecutable.Execute.api
+    let executableDeserializeAndLoad = field t "PJRT_Executable_DeserializeAndLoad" Executable.DeserializeAndLoad.api
+    let loadedExecutableFingerprint = field t "PJRT_LoadedExecutable_Fingerprint" LoadedExecutable.Fingerprint.api
+    let bufferDestroy = field t "PJRT_Buffer_Destroy" Buffer.Destroy.api
+    let bufferElementType = field t "PJRT_Buffer_ElementType" Buffer.ElementType.api
+    let bufferDimensions = field t "PJRT_Buffer_Dimensions" Buffer.Dimensions.api
+    let bufferUnpaddedDimensions = field t "PJRT_Buffer_UnpaddedDimensions" Buffer.UnpaddedDimensions.api
+    let bufferDynamicDimensionIndices = field t "PJRT_Buffer_DynamicDimensionIndices" Buffer.DynamicDimensionIndices.api
+    let bufferGetMemoryLayout = field t "PJRT_Buffer_GetMemoryLayout" Buffer.GetMemoryLayout.api
+    let bufferOnDeviceSizeInBytes = field t "PJRT_Buffer_OnDeviceSizeInBytes" Buffer.OnDeviceSizeInBytes.api
+    let bufferDevice = field t "PJRT_Buffer_Device" Buffer.Device.api
+    let bufferMemory = field t "PJRT_Buffer_Memory" Buffer.Memory.api
+    let bufferDelete = field t "PJRT_Buffer_Delete" Buffer.Delete.api
+    let bufferIsDeleted = field t "PJRT_Buffer_IsDeleted" Buffer.IsDeleted.api
+    let bufferCopyToDevice = field t "PJRT_Buffer_CopyToDevice" Buffer.CopyToDevice.api
+    let bufferToHostBuffer = field t "PJRT_Buffer_ToHostBuffer" Buffer.ToHostBuffer.api
+    let bufferIsOnCpu = field t "PJRT_Buffer_IsOnCpu" Buffer.IsOnCpu.api
+    let bufferReadyEvent = field t "PJRT_Buffer_ReadyEvent" Buffer.ReadyEvent.api
+    let bufferUnsafePointer = field t "PJRT_Buffer_UnsafePointer" Buffer.UnsafePointer.api
+
+    let bufferIncreaseExternalReferenceCount =
+      field t "PJRT_Buffer_IncreaseExternalReferenceCount" Buffer.IncreaseExternalReferenceCount.api
+
+    let bufferDecreaseExternalReferenceCount =
+      field t "PJRT_Buffer_DecreaseExternalReferenceCount" Buffer.DecreaseExternalReferenceCount.api
+
+    let bufferOpaqueDeviceMemoryDataPointer =
+      field t "PJRT_Buffer_OpaqueDeviceMemoryDataPointer" Buffer.OpaqueDeviceMemoryDataPointer.api
+
+    let copyToDeviceStreamDestroy = field t "PJRT_CopyToDeviceStream_Destroy" CopyDeviceStream.Destroy.api
+    let copyToDeviceStreamAddChunk = field t "PJRT_CopyToDeviceStream_AddChunk" CopyDeviceStream.AddChunk.api
+    let copyToDeviceStreamTotalBytes = field t "PJRT_CopyToDeviceStream_TotalBytes" CopyDeviceStream.TotalBytes.api
+    let copyToDeviceStreamGranuleSize = field t "PJRT_CopyToDeviceStream_GranuleSize" CopyDeviceStream.GranuleSize.api
+
+    let copyToDeviceStreamCurrentBytes =
+      field t "PJRT_CopyToDeviceStream_CurrentBytes" CopyDeviceStream.CurrentBytes.api
+
     (*
-    let pJRT_Plugin_Attributes = field _struct "PJRT_Plugin_Attributes" (ptr Plugin.Attributes.api)
+    let topologyDescriptionCreate = field t "PJRT_TopologyDescription_Create" Client.TopologyDescription.Create.api
+    let topologyDescriptionDestroy = field t "PJRT_TopologyDescription_Destroy" Client.TopologyDescription.Destroy.api
+    let topologyDescriptionPlatformName = field t "PJRT_TopologyDescription_PlatformName" TopologyDescription.PlatformName.api
+    let topologyDescriptionPlatformVersion = field t "PJRT_TopologyDescription_PlatformVersion" TopologyDescription.PlatformVersion.api
+    let topologyDescriptionGetDeviceDescriptions = field t "PJRT_TopologyDescription_GetDeviceDescriptions" TopologyDescription.GetDeviceDescriptions.api
+    let topologyDescriptionSerialize = field t "PJRT_TopologyDescription_Serialize" TopologyDescription.Serialize.api
+    let topologyDescriptionAttributes = field t "PJRT_TopologyDescription_Attributes" TopologyDescription.Attributes.api
+    *)
+    let compile = field t "PJRT_Compile" Client.Compile.api
+    let executableOutputElementTypes = field t "PJRT_Executable_OutputElementTypes" Executable_OutputElementTypes.api
+    let executableOutputDimensions = field t "PJRT_Executable_OutputDimensions" Executable.OutputDimensions.api
+    let bufferCopyToMemory = field t "PJRT_Buffer_CopyToMemory" Buffer.CopyToMemory.api
 
-    let pJRT_Event_Destroy = field _struct "PJRT_Event_Destroy" (ptr Event.Destroy.api)
-    let pJRT_Event_IsReady = field _struct "PJRT_Event_IsReady" (ptr Event.IsReady.api)
-    let pJRT_Event_Error = field _struct "PJRT_Event_Error" (ptr Event.Error.api)
-    let pJRT_Event_Await = field _struct "PJRT_Event_Await" (ptr Event.Await.api)
-    let pJRT_Event_OnReady = field _struct "PJRT_Event_OnReady" (ptr Event.OnReady.api)
-
-    let pJRT_Client_Create = field _struct "PJRT_Client_Create" (ptr Client.Create.api)
-    let pJRT_Client_Destroy = field _struct "PJRT_Client_Destroy" (ptr Client.Destroy.api)
-    let pJRT_Client_PlatformName = field _struct "PJRT_Client_PlatformName" (ptr Client.PlatformName.api)
-    let pJRT_Client_ProcessIndex = field _struct "PJRT_Client_ProcessIndex" (ptr Client.ProcessIndex.api)
-    let pJRT_Client_PlatformVersion = field _struct "PJRT_Client_PlatformVersion" (ptr Client.PlatformVersion.api)
-    let pJRT_Client_Devices = field _struct "PJRT_Client_Devices" (ptr Client.Devices.api)
-    let pJRT_Client_AddressableDevices = field _struct "PJRT_Client_AddressableDevices" (ptr Client.AddressableDevices.api)
-    let pJRT_Client_LookupDevice = field _struct "PJRT_Client_LookupDevice" (ptr Client.LookupDevice.api)
-    let pJRT_Client_LookupAddressableDevice = field _struct "PJRT_Client_LookupAddressableDevice" (ptr Client.LookupAddressableDevice.api)
-    let pJRT_Client_AddressableMemories = field _struct "PJRT_Client_AddressableMemories" (ptr Client.AddressableMemories.api)
-    let pJRT_Client_Compile = field _struct "PJRT_Client_Compile" (ptr Client.Compile.api)
-    let pJRT_Client_DefaultDeviceAssignment = field _struct "PJRT_Client_DefaultDeviceAssignment" (ptr Client.DefaultDeviceAssignment.api)
-    let pJRT_Client_BufferFromHostBuffer = field _struct "PJRT_Client_BufferFromHostBuffer" (ptr Client.BufferFromHostBuffer.api)
-
-    let pJRT_DeviceDescription_Id = field _struct "PJRT_DeviceDescription_Id" (ptr DeviceDescription.Id.api)
-    let pJRT_DeviceDescription_ProcessIndex = field _struct "PJRT_DeviceDescription_ProcessIndex" (ptr DeviceDescription.ProcessIndex.api)
-    let pJRT_DeviceDescription_Attributes = field _struct "PJRT_DeviceDescription_Attributes" (ptr DeviceDescription.Attributes.api)
-    let pJRT_DeviceDescription_Kind = field _struct "PJRT_DeviceDescription_Kind" (ptr DeviceDescription.Kind.api)
-    let pJRT_DeviceDescription_DebugString = field _struct "PJRT_DeviceDescription_DebugString" (ptr DeviceDescription.DebugString.api)
-    let pJRT_DeviceDescription_ToString = field _struct "PJRT_DeviceDescription_ToString" (ptr DeviceDescription.ToString.api)
-
-    let pJRT_Device_GetDescription = field _struct "PJRT_Device_GetDescription" (ptr Device.GetDescription.api)
-    let pJRT_Device_IsAddressable = field _struct "PJRT_Device_IsAddressable" (ptr Device.IsAddressable.api)
-    let pJRT_Device_LocalHardwareId = field _struct "PJRT_Device_LocalHardwareId" (ptr Device.LocalHardwareId.api)
-    let pJRT_Device_AddressableMemories = field _struct "PJRT_Device_AddressableMemories" (ptr Device.AddressableMemories.api)
-    let pJRT_Device_DefaultMemory = field _struct "PJRT_Device_DefaultMemory" (ptr Device.DefaultMemory.api)
-    let pJRT_Device_MemoryStats = field _struct "PJRT_Device_MemoryStats" (ptr Device.MemoryStats.api)
-
-    let pJRT_Memory_Id = field _struct "PJRT_Memory_Id" (ptr Memory.Id.api)
-    let pJRT_Memory_Kind = field _struct "PJRT_Memory_Kind" (ptr Memory.Kind.api)
-    let pJRT_Memory_DebugString = field _struct "PJRT_Memory_DebugString" (ptr Memory.DebugString.api)
-    let pJRT_Memory_ToString = field _struct "PJRT_Memory_ToString" (ptr Memory.ToString.api)
-    let pJRT_Memory_AddressableByDevices = field _struct "PJRT_Memory_AddressableByDevices" (ptr Memory.AddressableByDevices.api)
-
-    let pJRT_Executable_Destroy = field _struct "PJRT_Executable_Destroy" (ptr Executable.Destroy.api)
-    let pJRT_Executable_Name = field _struct "PJRT_Executable_Name" (ptr Executable.Name.api)
-    let pJRT_Executable_NumReplicas = field _struct "PJRT_Executable_NumReplicas" (ptr Executable.NumReplicas.api)
-    let pJRT_Executable_NumPartitions = field _struct "PJRT_Executable_NumPartitions" (ptr Executable.NumPartitions.api)
-    let pJRT_Executable_NumOutputs = field _struct "PJRT_Executable_NumOutputs" (ptr Executable.NumOutputs.api)
-    let pJRT_Executable_SizeOfGeneratedCodeInBytes = field _struct "PJRT_Executable_SizeOfGeneratedCodeInBytes" (ptr Executable.SizeOfGeneratedCodeInBytes.api)
-    let pJRT_Executable_GetCostAnalysis = field _struct "PJRT_Executable_GetCostAnalysis" (ptr Executable.GetCostAnalysis.api)
-    let pJRT_Executable_OutputMemoryKinds = field _struct "PJRT_Executable_OutputMemoryKinds" (ptr Executable.OutputMemoryKinds.api)
-    let pJRT_Executable_OptimizedProgram = field _struct "PJRT_Executable_OptimizedProgram" (ptr Executable.OptimizedProgram.api)
-    let pJRT_Executable_Serialize = field _struct "PJRT_Executable_Serialize" (ptr Executable.Serialize.api)
-
-    let pJRT_LoadedExecutable_Destroy = field _struct "PJRT_LoadedExecutable_Destroy" (ptr LoadedExecutable.Destroy.api)
-    let pJRT_LoadedExecutable_GetExecutable = field _struct "PJRT_LoadedExecutable_GetExecutable" (ptr LoadedExecutable.GetExecutable.api)
-    let pJRT_LoadedExecutable_AddressableDevices = field _struct "PJRT_LoadedExecutable_AddressableDevices" (ptr LoadedExecutable.AddressableDevices.api)
-    let pJRT_LoadedExecutable_Delete = field _struct "PJRT_LoadedExecutable_Delete" (ptr LoadedExecutable.Delete.api)
-    let pJRT_LoadedExecutable_IsDeleted = field _struct "PJRT_LoadedExecutable_IsDeleted" (ptr LoadedExecutable.IsDeleted.api)
-    let pJRT_LoadedExecutable_Execute = field _struct "PJRT_LoadedExecutable_Execute" (ptr LoadedExecutable.Execute.api)
-    let pJRT_Executable_DeserializeAndLoad = field _struct "PJRT_Executable_DeserializeAndLoad" (ptr Executable.DeserializeAndLoad.api)
-    let pJRT_LoadedExecutable_Fingerprint = field _struct "PJRT_LoadedExecutable_Fingerprint" (ptr LoadedExecutable.Fingerprint.api)
-
-    let pJRT_Buffer_Destroy = field _struct "PJRT_Buffer_Destroy" (ptr Buffer.Destroy.api)
-    let pJRT_Buffer_ElementType = field _struct "PJRT_Buffer_ElementType" (ptr Buffer.ElementType.api)
-    let pJRT_Buffer_Dimensions = field _struct "PJRT_Buffer_Dimensions" (ptr Buffer.Dimensions.api)
-    let pJRT_Buffer_UnpaddedDimensions = field _struct "PJRT_Buffer_UnpaddedDimensions" (ptr Buffer.UnpaddedDimensions.api)
-    let pJRT_Buffer_DynamicDimensionIndices = field _struct "PJRT_Buffer_DynamicDimensionIndices" (ptr Buffer.DynamicDimensionIndices.api)
-    let pJRT_Buffer_GetMemoryLayout = field _struct "PJRT_Buffer_GetMemoryLayout" (ptr Buffer.GetMemoryLayout.api)
-    let pJRT_Buffer_OnDeviceSizeInBytes = field _struct "PJRT_Buffer_OnDeviceSizeInBytes" (ptr Buffer.OnDeviceSizeInBytes.api)
-    let pJRT_Buffer_Device = field _struct "PJRT_Buffer_Device" (ptr Buffer.Device.api)
-    let pJRT_Buffer_Memory = field _struct "PJRT_Buffer_Memory" (ptr Buffer.Memory.api)
-    let pJRT_Buffer_Delete = field _struct "PJRT_Buffer_Delete" (ptr Buffer.Delete.api)
-    let pJRT_Buffer_IsDeleted = field _struct "PJRT_Buffer_IsDeleted" (ptr Buffer.IsDeleted.api)
-    let pJRT_Buffer_CopyToDevice = field _struct "PJRT_Buffer_CopyToDevice" (ptr Buffer.CopyToDevice.api)
-    let pJRT_Buffer_ToHostBuffer = field _struct "PJRT_Buffer_ToHostBuffer" (ptr Buffer.ToHostBuffer.api)
-    let pJRT_Buffer_IsOnCpu = field _struct "PJRT_Buffer_IsOnCpu" (ptr Buffer.IsOnCpu.api)
-    let pJRT_Buffer_ReadyEvent = field _struct "PJRT_Buffer_ReadyEvent" (ptr Buffer.ReadyEvent.api)
-    let pJRT_Buffer_UnsafePointer = field _struct "PJRT_Buffer_UnsafePointer" (ptr Buffer.UnsafePointer.api)
-    let pJRT_Buffer_IncreaseExternalReferenceCount = field _struct "PJRT_Buffer_IncreaseExternalReferenceCount" (ptr Buffer.IncreaseExternalReferenceCount.api)
-    let pJRT_Buffer_DecreaseExternalReferenceCount = field _struct "PJRT_Buffer_DecreaseExternalReferenceCount" (ptr Buffer.DecreaseExternalReferenceCount.api)
-    let pJRT_Buffer_OpaqueDeviceMemoryDataPointer = field _struct "PJRT_Buffer_OpaqueDeviceMemoryDataPointer" (ptr Buffer.OpaqueDeviceMemoryDataPointer.api)
-
-    let pJRT_CopyToDeviceStream_Destroy = field _struct "PJRT_CopyToDeviceStream_Destroy" (ptr CopyDeviceStream.Destroy.api)
-    let pJRT_CopyToDeviceStream_AddChunk = field _struct "PJRT_CopyToDeviceStream_AddChunk" (ptr CopyDeviceStream.AddChunk.api)
-    let pJRT_CopyToDeviceStream_TotalBytes = field _struct "PJRT_CopyToDeviceStream_TotalBytes" (ptr CopyDeviceStream.TotalBytes.api)
-    let pJRT_CopyToDeviceStream_GranuleSize = field _struct "PJRT_CopyToDeviceStream_GranuleSize" (ptr CopyDeviceStream.GranuleSize.api)
-    let pJRT_CopyToDeviceStream_CurrentBytes = field _struct "PJRT_CopyToDeviceStream_CurrentBytes" (ptr CopyDeviceStream.CurrentBytes.api)
-
-    let pJRT_TopologyDescription_Create = field _struct "PJRT_TopologyDescription_Create" (ptr TopologyDescription.Create.api)
-    let pJRT_TopologyDescription_Destroy = field _struct "PJRT_TopologyDescription_Destroy" (ptr TopologyDescription.Destroy.api)
-    let pJRT_TopologyDescription_PlatformName = field _struct "PJRT_TopologyDescription_PlatformName" (ptr TopologyDescription.PlatformName.api)
-    let pJRT_TopologyDescription_PlatformVersion = field _struct "PJRT_TopologyDescription_PlatformVersion" (ptr TopologyDescription.PlatformVersion.api)
-    let pJRT_TopologyDescription_GetDeviceDescriptions = field _struct "PJRT_TopologyDescription_GetDeviceDescriptions" (ptr TopologyDescription.GetDeviceDescriptions.api)
-    let pJRT_TopologyDescription_Serialize = field _struct "PJRT_TopologyDescription_Serialize" (ptr TopologyDescription.Serialize.api)
-    let pJRT_TopologyDescription_Attributes = field _struct "PJRT_TopologyDescription_Attributes" (ptr TopologyDescription.Attributes.api)
-
-    let pJRT_Compile = field _struct "PJRT_Compile" (ptr Compile.api)
-
-    let pJRT_Executable_OutputElementTypes = field _struct "PJRT_Executable_OutputElementTypes" (ptr Executable.OutputElementTypes.api)
-    let pJRT_Executable_OutputDimensions = field _struct "PJRT_Executable_OutputDimensions" (ptr Executable.OutputDimensions.api)
-    let pJRT_Buffer_CopyToMemory = field _struct "PJRT_Buffer_CopyToMemory" (ptr Buffer.CopyToMemory.api)
     (* Assuming Client.CreateViewOfDeviceBuffer.api is defined in type_description_client.ml *)
-    let pJRT_Client_CreateViewOfDeviceBuffer = field _struct "PJRT_Client_CreateViewOfDeviceBuffer" (ptr Client.CreateViewOfDeviceBuffer.api)
-    let pJRT_Executable_Fingerprint = field _struct "PJRT_Executable_Fingerprint" (ptr Executable.Fingerprint.api)
+    let clientCreateViewOfDeviceBuffer = field t "PJRT_Client_CreateViewOfDeviceBuffer" CreateViewOfDeviceBuffer.api
+    let executableFingerprint = field t "PJRT_Executable_Fingerprint" Executable.Fingerprint.api
+
     (* Assuming Client.TopologyDescription.api is defined in type_description_client.ml *)
-    let pJRT_Client_TopologyDescription = field _struct "PJRT_Client_TopologyDescription" (ptr Client.TopologyDescription.api)
-    let pJRT_Executable_GetCompiledMemoryStats = field _struct "PJRT_Executable_GetCompiledMemoryStats" (ptr Executable.GetCompiledMemoryStats.api)
-    let pJRT_Memory_Kind_Id = field _struct "PJRT_Memory_Kind_Id" (ptr Memory.KindId.api)
-    let pJRT_ExecuteContext_Create = field _struct "PJRT_ExecuteContext_Create" (ptr ExecuteContext.Create.api)
-    let pJRT_ExecuteContext_Destroy = field _struct "PJRT_ExecuteContext_Destroy" (ptr ExecuteContext.Destroy.api)
-    let pJRT_Buffer_CopyRawToHost = field _struct "PJRT_Buffer_CopyRawToHost" (ptr Buffer.CopyRawToHost.api)
+    let clientTopologyDescription = field t "PJRT_Client_TopologyDescription" Client.TopologyDescription.api
+
+    let executableGetCompiledMemoryStats =
+      field t "PJRT_Executable_GetCompiledMemoryStats" Executable.GetCompiledMemoryStats.api
+
+    let memoryKindId = field t "PJRT_Memory_Kind_Id" Memory.KindId.api
+    let executeContextCreate = field t "PJRT_ExecuteContext_Create" ExecuteContext.Create.api
+    let executeContextDestroy = field t "PJRT_ExecuteContext_Destroy" ExecuteContext.Destroy.api
+    let bufferCopyRawToHost = field t "PJRT_Buffer_CopyRawToHost" Buffer.CopyRawToHost.api
 
     (* PJRT_AsyncHostToDeviceTransferManager and its functions are omitted for now,
        as their OCaml types (e.g., AsyncHostToDeviceTransferManager.Destroy.api)
        are assumed not to be defined yet. *)
     (* Assuming Client.CreateBuffersForAsyncHostToDevice.api is defined in type_description_client.ml *)
-    let pJRT_Client_CreateBuffersForAsyncHostToDevice = field _struct "PJRT_Client_CreateBuffersForAsyncHostToDevice" (ptr Client.CreateBuffersForAsyncHostToDevice.api)
+    let clientCreateBuffersForAsyncHostToDevice =
+      field t "PJRT_Client_CreateBuffersForAsyncHostToDevice" Client.CreateBuffersForAsyncHostToDevice.api
 
     (* Assuming Client.DmaMap.api and Client.DmaUnmap.api are defined in type_description_client.ml *)
-    let pJRT_Client_DmaMap = field _struct "PJRT_Client_DmaMap" (ptr Client.DmaMap.api)
-    let pJRT_Client_DmaUnmap = field _struct "PJRT_Client_DmaUnmap" (ptr Client.DmaUnmap.api)
-    *)
-
+    let clientDmaMap = field t "PJRT_Client_DmaMap" Client.DmaMap.api
+    let clientDmaUnmap = field t "PJRT_Client_DmaUnmap" Client.DmaUnmap.api
     let () = seal t
     let const_t = ptr @@ const t
   end
