@@ -259,15 +259,20 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let copyToDeviceStreamCurrentBytes =
       field t "PJRT_CopyToDeviceStream_CurrentBytes" CopyDeviceStream.CurrentBytes.api
 
-    (*
-    let topologyDescriptionCreate = field t "PJRT_TopologyDescription_Create" Client.TopologyDescription.Create.api
-    let topologyDescriptionDestroy = field t "PJRT_TopologyDescription_Destroy" Client.TopologyDescription.Destroy.api
-    let topologyDescriptionPlatformName = field t "PJRT_TopologyDescription_PlatformName" TopologyDescription.PlatformName.api
-    let topologyDescriptionPlatformVersion = field t "PJRT_TopologyDescription_PlatformVersion" TopologyDescription.PlatformVersion.api
-    let topologyDescriptionGetDeviceDescriptions = field t "PJRT_TopologyDescription_GetDeviceDescriptions" TopologyDescription.GetDeviceDescriptions.api
+    let topologyDescriptionCreate = field t "PJRT_TopologyDescription_Create" TopologyDescription.Create.api
+    let topologyDescriptionDestroy = field t "PJRT_TopologyDescription_Destroy" TopologyDescription.Destroy.api
+
+    let topologyDescriptionPlatformName =
+      field t "PJRT_TopologyDescription_PlatformName" TopologyDescription.PlatformName.api
+
+    let topologyDescriptionPlatformVersion =
+      field t "PJRT_TopologyDescription_PlatformVersion" TopologyDescription.PlatformVersion.api
+
+    let topologyDescriptionGetDeviceDescriptions =
+      field t "PJRT_TopologyDescription_GetDeviceDescriptions" TopologyDescription.GetDeviceDescriptions.api
+
     let topologyDescriptionSerialize = field t "PJRT_TopologyDescription_Serialize" TopologyDescription.Serialize.api
     let topologyDescriptionAttributes = field t "PJRT_TopologyDescription_Attributes" TopologyDescription.Attributes.api
-    *)
     let compile = field t "PJRT_Compile" Client.Compile.api
     let executableOutputElementTypes = field t "PJRT_Executable_OutputElementTypes" Executable_OutputElementTypes.api
     let executableOutputDimensions = field t "PJRT_Executable_OutputDimensions" Executable.OutputDimensions.api
