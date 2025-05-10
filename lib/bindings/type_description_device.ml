@@ -8,7 +8,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
   module Chunk = struct
     type t
 
-    let _, (t : t structure typ) = make_struct_base "Chunk" (* Note: PJRT_Chunk is not a pjrt_struct *)
+    let _, (t : t structure typ) = make_struct_base "Chunk"
     let data = field t "data" @@ ptr void
     let size = field t "size" size_t
 

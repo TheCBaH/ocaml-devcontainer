@@ -180,10 +180,10 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
     let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Api"
     let api_version_field = field t "pjrt_api_version" Version.t
-    let errorDestroy = field t "PJRT_Error_Destroy" (ptr Error.Destroy.api)
-    let errorMessage = field t "PJRT_Error_Message" (ptr Error.Message.api)
-    let errorGetCode = field t "PJRT_Error_GetCode" (ptr Error.GetCode.api)
-    let pluginInitialize = field t "PJRT_Plugin_Initialize" (ptr Plugin.Initialize.api)
+    let errorDestroy = field t "PJRT_Error_Destroy" Error.Destroy.api
+    let errorMessage = field t "PJRT_Error_Message" Error.Message.api
+    let errorGetCode = field t "PJRT_Error_GetCode" Error.GetCode.api
+    let pluginInitialize = field t "PJRT_Plugin_Initialize" Plugin.Initialize.api
     (*
     let pJRT_Plugin_Attributes = field _struct "PJRT_Plugin_Attributes" (ptr Plugin.Attributes.api)
 
