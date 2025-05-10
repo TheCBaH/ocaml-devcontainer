@@ -418,4 +418,18 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let api =
       typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Client_CreateViewOfDeviceBuffer"
   end
+
+  module Executable_OutputElementTypes = struct
+    module Args = struct
+      type t
+
+      let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "Executable_OutputElementTypes_Args"
+      let executable = field t "executable" @@ ptr executable
+      let output_types = field t "output_types" @@ ptr bufferType (* out  *)
+      let num_output_types = field t "num_output_types" size_t (* out *)
+      let () = seal t
+    end
+
+    let api = typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "Executable_OutputElementTypes"
+  end
 end
