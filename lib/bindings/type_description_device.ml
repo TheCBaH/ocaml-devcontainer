@@ -5,6 +5,21 @@ module Types (F : Cstubs.Types.TYPE) = struct
   open Pjrt_base.Type_description.Base (F)
   open F
 
+  module Chunk = struct
+    type t
+
+    let _, (t : t structure typ) = make_struct_base "Chunk" (* Note: PJRT_Chunk is not a pjrt_struct *)
+    let data = field t "data" @@ ptr void
+    let size = field t "size" size_t
+
+    let deleter =
+      field t "deleter" @@ static_funptr (ptr void (* data *) @-> ptr void (* deleter_arg *) @-> returning void)
+
+    (* `deleter_arg` will be passed to `deleter` as `deleter_arg` argument. *)
+    let deleter_arg = field t "deleter_arg" @@ ptr void
+    let () = seal t
+  end
+
   module DeviceDescription = struct
     (* Device descriptions may be associated with an actual device
      (via PJRT_Device_GetDescription), but they can also be used to describe a
@@ -700,21 +715,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
     end
 
     module Execute = struct
-      module Chunk = struct
-        type t
-
-        let _, (t : t structure typ) = make_struct_base "Chunk" (* Note: PJRT_Chunk is not a pjrt_struct *)
-        let data = field t "data" @@ ptr void
-        let size = field t "size" size_t
-
-        let deleter =
-          field t "deleter" @@ static_funptr (ptr void (* data *) @-> ptr void (* deleter_arg *) @-> returning void)
-
-        (* `deleter_arg` will be passed to `deleter` as `deleter_arg` argument. *)
-        let deleter_arg = field t "deleter_arg" @@ ptr void
-        let () = seal t
-      end
-
       let sendCallback =
         typedef
           (static_funptr
@@ -833,6 +833,77 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
       let api =
         typedef (static_funptr (ptr Args.t (* args *) @-> returning error)) @@ _NS "LoadedExecutable_Fingerprint"
+    end
+  end
+
+  module CopyDeviceStream = struct
+    module Destroy = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "CopyToDeviceStream_Destroy_Args"
+        let stream = field t "stream" @@ ptr copyToDeviceStream
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_Destroy"
+    end
+
+    module AddChunk = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "CopyToDeviceStream_AddChunk_Args"
+        let stream = field t "stream" @@ ptr copyToDeviceStream
+        let chunk = field t "chunk" @@ ptr Chunk.t
+        let transfer_complete = field t "transfer_complete" @@ ptr event (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_AddChunk"
+    end
+
+    module TotalBytes = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "CopyToDeviceStream_TotalBytes_Args"
+        let stream = field t "stream" @@ ptr copyToDeviceStream
+        let total_bytes = field t "total_bytes" int64_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_TotalBytes"
+    end
+
+    module GranuleSize = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "CopyToDeviceStream_GranuleSize_Args"
+
+        let stream = field t "stream" @@ ptr copyToDeviceStream
+        let granule_size_in_bytes = field t "granule_size_in_bytes" int64_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_GranuleSize"
+    end
+
+    module CurrentBytes = struct
+      module Args = struct
+        type t
+
+        let extension_start, struct_size, size, (t : t structure typ) =
+          pjrt_struct "CopyToDeviceStream_CurrentBytes_Args"
+
+        let stream = field t "stream" @@ ptr copyToDeviceStream
+        let current_bytes = field t "current_bytes" int64_t (* out *)
+        let () = seal t
+      end
+
+      let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_CurrentBytes"
     end
   end
 end
