@@ -156,25 +156,6 @@ module Types (F : Cstubs.Types.TYPE) = struct
     let () = seal t
   end
 
-  (*
-  module Compile = struct
-    module Args = struct
-      type t
-      let extension_start, struct_size, size, (t_struct : t structure typ) = pjrt_struct "Compile_Args"
-      let topology = field t_struct "topology" (ptr (const topologyDescription))
-      let program_ptr = field t_struct "program" (ptr (const program)) (* Renamed to avoid conflict if 'program' is a keyword/type *)
-      let compile_options = field t_struct "compile_options" string
-      let compile_options_size = field t_struct "compile_options_size" size_t
-      let client_ptr = field t_struct "client" (ptr client) (* Renamed, optional, can be null *)
-      let executable_ptr = field t_struct "executable" (ptr executable) (* Renamed, out *)
-      let () = seal t_struct
-    end
-    (* Compiles a program in specified format (such as MLIR or HLO) with given
-       `options`. The returned executable must be loaded by a compatible
-       PJRT_Client before execution. *)
-    let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "Compile"
-  end
-  *)
   module Api = struct
     type t
 
