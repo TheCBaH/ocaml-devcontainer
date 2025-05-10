@@ -846,6 +846,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Frees `stream`. `stream` can be nullptr. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_Destroy"
     end
 
@@ -855,11 +856,20 @@ module Types (F : Cstubs.Types.TYPE) = struct
 
         let extension_start, struct_size, size, (t : t structure typ) = pjrt_struct "CopyToDeviceStream_AddChunk_Args"
         let stream = field t "stream" @@ ptr copyToDeviceStream
+
+        (* Takes ownership of `chunk` (i.e. implementation will call chunk.deleter). *)
         let chunk = field t "chunk" @@ ptr Chunk.t
         let transfer_complete = field t "transfer_complete" @@ ptr event (* out *)
         let () = seal t
       end
 
+      (* Emplaces a new chunk of data to copy to the device. The transfer is started
+         immediately, and the returned event is triggered when the transfer completes
+         or fails.
+
+         The returned event will indicate an error if the chunk's size causes the
+         amount of transferred data to exceed the total bytes, if the stream is
+         already complete, or if the chunk is not a multiple of the granule size. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_AddChunk"
     end
 
@@ -873,6 +883,7 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Returns the total amount of data the stream expects to be transferred. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_TotalBytes"
     end
 
@@ -888,6 +899,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Returns the granule size in bytes. The size of the chunk added to this stream
+         must be a multiple of this number. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_GranuleSize"
     end
 
@@ -903,6 +916,8 @@ module Types (F : Cstubs.Types.TYPE) = struct
         let () = seal t
       end
 
+      (* Returns the amount of data the stream currently has either transferred or has
+         buffered to transfer. *)
       let api = typedef (static_funptr (ptr Args.t @-> returning error)) @@ _NS "CopyToDeviceStream_CurrentBytes"
     end
   end
