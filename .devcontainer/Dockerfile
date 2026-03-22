@@ -10,5 +10,5 @@ RUN set -eux;\
   wget\
   xz-utils\
 ;\
-    apt-get autoremove -y; apt-get clean -y ; apt-get clean; rm -rf /var/lib/apt/lists/*;\
+    apt-get autoremove -y; apt-get clean -y ; rm -rf /var/lib/apt/lists/*;\
     echo DONE

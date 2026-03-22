@@ -13,9 +13,7 @@
             "upgradePackages": "false"
         },
         "./features/ocaml": {
-            "packages": "utop",
-            "options": "ocaml-option-static",
-            "system-packages": "musl-dev musl-tools"
+            "packages": "utop"
         },
     },
     "customizations": {
