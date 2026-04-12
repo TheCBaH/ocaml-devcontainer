@@ -13,7 +13,7 @@
             "upgradePackages": "false"
         },
         "./features/ocaml": {
-            "packages": "utop",
+            "packages": "utop ocamlformat#0.28.1",
             "options": "ocaml-option-static",
             "system-packages": "musl-dev musl-tools"
         },
