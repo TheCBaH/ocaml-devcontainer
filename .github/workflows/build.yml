@@ -39,3 +39,6 @@ jobs:
         file _build/default/main.exe
         ls -lh _build/default/main.exe
         _build/default/main.exe
+    - name: format-check
+      run: |
+        ${{ env.EXEC }} make format-check

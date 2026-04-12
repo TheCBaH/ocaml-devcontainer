@@ -8,6 +8,9 @@ static:
 format:
 	opam exec dune fmt
 
+format-check:
+	opam exec -- dune build @fmt
+
 run:
 	opam exec dune exec ./main.exe
 
@@ -20,4 +23,4 @@ utop:
 clean:
 	opam exec dune $@
 
-.PHONY: default clean format run top utop
+.PHONY: default clean format format-check run top utop
