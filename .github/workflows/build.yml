@@ -54,6 +54,10 @@ jobs:
         file _build/default/main.exe
         ls -lh _build/default/main.exe
         _build/default/main.exe
+        ${{ env.EXEC }} sh -c 'chmod +w _build/default/main.exe && strip _build/default/main.exe'
+        file _build/default/main.exe
+        ls -lh _build/default/main.exe
+        _build/default/main.exe
     - name: format-check
       run: |
         ${{ env.EXEC }} make format-check
