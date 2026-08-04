@@ -14,7 +14,7 @@
         },
         "./features/ocaml": {
             "version": "${localEnv:OCAML_VERSION}",
-            "packages": "utop ocamlformat#0.28.1 "
+            "packages": "ocamlformat#0.28.1"
         }
     },
     "customizations": {
