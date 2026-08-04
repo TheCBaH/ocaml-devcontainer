@@ -14,10 +14,8 @@
         },
         "./features/ocaml": {
             "version": "${localEnv:OCAML_VERSION}",
-            "packages": "utop ocamlformat#0.28.1",
-            "options": "ocaml-option-static",
-            "system-packages": "musl-dev musl-tools"
-        },
+            "packages": "utop ocamlformat#0.28.1 "
+        }
     },
     "customizations": {
         "vscode": {
@@ -28,7 +26,9 @@
     },
     "remoteUser": "vscode",
     "postCreateCommand": {
+	"submodules": "git submodule update --init --depth 1",
         "opam": "sudo sh -ceux \"chown -R $(id -u):$(id -g) ${OPAMROOT}/log\""
+
     },
     "waitFor": "postCreateCommand"
 }
