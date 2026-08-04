@@ -1,0 +1,63 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  versions:
+    uses: ./.github/workflows/ocaml-versions.yml
+  build:
+    needs: versions
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.versions.outputs.images_matrix) }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v7
+      with:
+        submodules: true
+    - name: devcontainer
+      uses: ./.github/workflows/actions/devcontainer
+      id: devcontainer
+      env:
+        OCAML_VERSION: ${{ matrix.ocaml_version }}
+      with:
+        variant: ${{ matrix.ocaml_version }}
+        platform: ${{ matrix.platform }}
+    - name: setup
+      run: |
+        echo 'EXEC=${{ steps.devcontainer.outputs.exec }}' >> $GITHUB_ENV
+    - name: info
+      run: |
+        ${{ env.EXEC }} sh -c 'uname -m && getconf LONG_BIT && opam exec -- ocaml --version'
+    - name: build
+      run: |
+        ${{ env.EXEC }} make
+        file _build/default/main.exe
+        ls -lh _build/default/main.exe
+    - name: run
+      run: |
+        ${{ env.EXEC }} make run
+    - name: top
+      run: |
+        echo 'Example.Hello.print ();;' | ${{ env.EXEC }} make top
+    - name: utop
+      run: |
+        echo 'Example.Hello.print ();;' | ${{ env.EXEC }} make utop
+    - name: static
+      run: |
+        ${{ env.EXEC }} make static
+        file _build/default/main.exe
+        ls -lh _build/default/main.exe
+        _build/default/main.exe
+        ${{ env.EXEC }} sh -c 'chmod +w _build/default/main.exe && strip _build/default/main.exe'
+        file _build/default/main.exe
+        ls -lh _build/default/main.exe
+        _build/default/main.exe
+    - name: format-check
+      run: |
+        ${{ env.EXEC }} make format-check
