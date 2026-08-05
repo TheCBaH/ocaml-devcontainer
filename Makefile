@@ -1,12 +1,11 @@
 COMPCERT_DIR := modules/CompCert
 COMPCERT_ARCH := $(shell m=$$(uname -m); \
-  case "$$m" in \
-    aarch64|arm64) echo aarch64-linux ;; \
-    x86_64|amd64) echo x86_64-linux ;; \
-    i686|i386) echo x86_32-linux ;; \
-    armv7l|armv6l|arm) echo arm-linux ;; \
-    *) echo x86_64-linux ;; \
-  esac)
+  if [ "$$m" = aarch64 ] || [ "$$m" = arm64 ]; then echo aarch64-linux; \
+  elif [ "$$m" = x86_64 ] || [ "$$m" = amd64 ]; then echo x86_64-linux; \
+  elif [ "$$m" = i686 ] || [ "$$m" = i386 ]; then echo x86_32-linux; \
+  elif [ "$$m" = armv7l ] || [ "$$m" = armv6l ] || [ "$$m" = arm ]; then echo arm-linux; \
+  else echo x86_64-linux; \
+  fi)
 COMPCERT_JOBS := $(shell nproc)
 
 default: compcert
