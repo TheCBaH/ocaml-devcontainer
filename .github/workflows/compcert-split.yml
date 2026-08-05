@@ -67,3 +67,9 @@ jobs:
     - name: smoke-test
       run: |
         ${{ env.EXEC }} modules/CompCert/ccomp -version
+    - name: lib-build
+      run: |
+        ${{ env.EXEC }} make compcert-lib-build
+    - name: lib-smoke-test
+      run: |
+        ${{ env.EXEC }} make compcert-lib-run ARGS=-version
