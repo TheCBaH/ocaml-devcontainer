@@ -5,13 +5,30 @@ COMPCERT_LIB_DIR := compcert-lib
 
 default: compcert
 
+# PLATFORM (linux/amd64, linux/i386, linux/arm/v7, ...) is the devcontainer
+# action's generic Docker-platform env var, forwarded into the container via
+# `devcontainer exec --remote-env`; when set it's preferred over `uname -m`,
+# which isn't reliable here: on a 32-bit container running on a 64-bit host
+# (e.g. linux/i386 on an amd64 host, linux/arm/v7 on an arm64 host) it
+# reports the *host's* 64-bit machine type, not the container's, since
+# nothing switches the process's kernel personality just because the
+# image/binaries are 32-bit. This has to stay a shell expression run from
+# the recipe (as opposed to a $(shell ...)-computed make variable): the case
+# statement's bare `pattern)` labels contain unbalanced parentheses, which
+# confuses make's own paren matching when used inside $(shell ...).
 compcert-configure:
-	cd $(COMPCERT_DIR) && opam exec -- ./configure $$(m=$$(uname -m); case "$$m" in \
-	  aarch64|arm64) echo aarch64-linux ;; \
-	  x86_64|amd64) echo x86_64-linux ;; \
-	  i686|i386) echo x86_32-linux ;; \
-	  armv7l|armv6l|arm) echo arm-linux ;; \
-	  *) echo x86_64-linux ;; \
+	cd $(COMPCERT_DIR) && opam exec -- ./configure $$(case "$$PLATFORM" in \
+	  linux/aarch64|linux/arm64) echo aarch64-linux ;; \
+	  linux/amd64|linux/x86_64) echo x86_64-linux ;; \
+	  linux/i386|linux/386) echo x86_32-linux ;; \
+	  linux/arm/v7*|linux/arm/v6*|linux/arm) echo arm-linux ;; \
+	  *) m=$$(uname -m); case "$$m" in \
+	       aarch64|arm64) echo aarch64-linux ;; \
+	       x86_64|amd64) echo x86_64-linux ;; \
+	       i686|i386) echo x86_32-linux ;; \
+	       armv7l|armv6l|arm) echo arm-linux ;; \
+	       *) echo x86_64-linux ;; \
+	     esac ;; \
 	esac)
 
 compcert-build:
@@ -33,7 +50,15 @@ compcert: compcert-configure compcert-build
 # Makefile.config is included because CompCert's own ./configure refuses
 # to run without Rocq present, even though its content (compiler paths,
 # target arch, ...) has nothing to do with Rocq.
+# `depend` has to run before `extraction`: CompCert's source lists (VLIB,
+# COMMON, ...) name files without their subdirectory, and it's only the
+# generated .depend file that tells make the .vo targets live under lib/,
+# common/, etc. Without it, coqc gets invoked on bare filenames and fails to
+# find them. CompCert's own `all`/`light` targets get this for free (they
+# run `depend` before `proof`/`extraction`); calling `extraction` directly
+# skips that, so it's done explicitly here.
 compcert-extraction-archive: compcert-configure
+	cd $(COMPCERT_DIR) && opam exec -- $(MAKE) -j$(COMPCERT_JOBS) depend
 	cd $(COMPCERT_DIR) && opam exec -- $(MAKE) -j$(COMPCERT_JOBS) extraction
 	cd $(COMPCERT_DIR) && tar -czf ../../$(COMPCERT_EXTRACTION_ARCHIVE) \
 	  Makefile.config extraction/*.ml extraction/*.mli

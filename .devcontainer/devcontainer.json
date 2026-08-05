@@ -2,7 +2,8 @@
 {
     "name": "CompCert devcontainer",
     "build":  {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile",
+        "options": ["--platform=${localEnv:PLATFORM:linux/amd64}"]
     },
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
