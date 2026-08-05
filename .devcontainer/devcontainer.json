@@ -14,7 +14,9 @@
         },
         "./features/ocaml": {
             "version": "${localEnv:OCAML_VERSION}",
-            "packages": "ocamlformat#0.28.1"
+            "packages": "ocamlformat#0.28.1 ${localEnv:OCAML_EXTRA_PACKAGES}",
+            "system-packages": "${localEnv:OCAML_SYSTEM_PACKAGES}",
+            "repositories": "${localEnv:OCAML_OPAM_REPOSITORIES}"
         }
     },
     "customizations": {
@@ -26,7 +28,7 @@
     },
     "remoteUser": "vscode",
     "postCreateCommand": {
-	"submodules": "git submodule update --init --depth 1",
+	"submodules": "git submodule update --init --recursive --depth 1",
         "opam": "sudo sh -ceux \"chown -R $(id -u):$(id -g) ${OPAMROOT}/log\""
 
     },

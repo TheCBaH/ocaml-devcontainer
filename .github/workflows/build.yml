@@ -61,3 +61,46 @@ jobs:
     - name: format-check
       run: |
         ${{ env.EXEC }} make format-check
+  compcert:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux/amd64
+          - os: ubuntu-24.04-arm
+            platform: linux/arm64
+    steps:
+    - name: checkout
+      uses: actions/checkout@v7
+      with:
+        submodules: true
+    - name: devcontainer
+      uses: ./.github/workflows/actions/devcontainer
+      id: devcontainer
+      env:
+        OCAML_EXTRA_PACKAGES: rocq-prover menhir
+        OCAML_SYSTEM_PACKAGES: libgmp-dev pkg-config
+        OCAML_OPAM_REPOSITORIES: rocq-released https://rocq-prover.org/opam/released
+      with:
+        variant: compcert
+        platform: ${{ matrix.platform }}
+    - name: setup
+      run: |
+        echo 'EXEC=${{ steps.devcontainer.outputs.exec }}' >> $GITHUB_ENV
+    - name: info
+      run: |
+        ${{ env.EXEC }} sh -c 'uname -m && opam exec -- rocq --version'
+    - name: configure
+      run: |
+        ${{ env.EXEC }} make compcert-configure
+    - name: build
+      run: |
+        ${{ env.EXEC }} make compcert-build
+    - name: check-proof
+      run: |
+        ${{ env.EXEC }} make compcert-check-proof
+    - name: test
+      run: |
+        ${{ env.EXEC }} make compcert-test
