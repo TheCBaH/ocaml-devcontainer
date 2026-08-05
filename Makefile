@@ -1,33 +1,15 @@
-
-default:
-	opam exec -- dune build
-
-hello: run
-
-static:
-	opam exec -- dune build --profile static
-
-format:
-	opam exec -- dune fmt
-
-format-check:
-	opam exec -- dune build @fmt
-
-run:
-	opam exec -- dune exec -- ./main.exe
-
-top:
-	opam exec -- dune exec -- ./example_top.exe
-
-utop:
-	opam exec -- dune utop
-
-clean:
-	opam exec -- dune $@
-
 COMPCERT_DIR := modules/CompCert
-COMPCERT_ARCH := $(shell m=$$(uname -m); if [ "$$m" = "aarch64" ] || [ "$$m" = "arm64" ]; then echo aarch64-linux; else echo x86_64-linux; fi)
+COMPCERT_ARCH := $(shell m=$$(uname -m); \
+  case "$$m" in \
+    aarch64|arm64) echo aarch64-linux ;; \
+    x86_64|amd64) echo x86_64-linux ;; \
+    i686|i386) echo x86_32-linux ;; \
+    armv7l|armv6l|arm) echo arm-linux ;; \
+    *) echo x86_64-linux ;; \
+  esac)
 COMPCERT_JOBS := $(shell nproc)
+
+default: compcert
 
 compcert-configure:
 	cd $(COMPCERT_DIR) && opam exec -- ./configure $(COMPCERT_ARCH)
@@ -44,5 +26,5 @@ compcert-test:
 
 compcert: compcert-configure compcert-build
 
-.PHONY: default clean format format-check run top utop \
+.PHONY: default \
   compcert compcert-configure compcert-build compcert-check-proof compcert-test

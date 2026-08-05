@@ -1,6 +1,4 @@
 {
-    "ocaml.repl.path": "make",
-    "ocaml.repl.args": ["utop"],
     "ocaml.sandbox": {
         "kind": "opam",
         "switch": "default"
@@ -9,6 +7,8 @@
         "ocamlformat",
         "opam",
         "OPAMROOT",
-        "utop"
+        "rocq",
+        "compcert",
+        "ccomp"
     ]
 }

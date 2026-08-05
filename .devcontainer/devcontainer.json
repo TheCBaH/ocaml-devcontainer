@@ -1,6 +1,6 @@
 // For format details, see https://aka.ms/devcontainer.json.
 {
-    "name": "ocaml devcontainers examples",
+    "name": "CompCert devcontainer",
     "build":  {
         "dockerfile": "Dockerfile"
     },
@@ -14,9 +14,9 @@
         },
         "./features/ocaml": {
             "version": "${localEnv:OCAML_VERSION}",
-            "packages": "ocamlformat#0.28.1 ${localEnv:OCAML_EXTRA_PACKAGES}",
-            "system-packages": "${localEnv:OCAML_SYSTEM_PACKAGES}",
-            "repositories": "${localEnv:OCAML_OPAM_REPOSITORIES}"
+            "packages": "ocamlformat#0.28.1 rocq-prover menhir",
+            "system-packages": "libgmp-dev pkg-config",
+            "repositories": "rocq-released https://rocq-prover.org/opam/released"
         }
     },
     "customizations": {
