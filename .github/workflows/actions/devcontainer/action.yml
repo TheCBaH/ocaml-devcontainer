@@ -61,43 +61,16 @@ runs:
         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
         TAG="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
         TAG=$(echo $TAG | tr '[A-Z].' '[a-z]_')
-        CONFIG_FILE='${{ inputs.config }}'
-        if [ -z "$CONFIG_FILE" ]; then
-          CONFIG_FILE=".devcontainer/devcontainer.json"
+        CONFIG_ARG=""
+        if [ -n '${{ inputs.config }}' ]; then
+          CONFIG_ARG="--config ${{ inputs.config }}"
         fi
-        # `devcontainer up` has no --platform flag of its own (only
-        # `devcontainer build` does), and DOCKER_DEFAULT_PLATFORM alone isn't
-        # reliably honored by `docker buildx build` once a --cache-from image
-        # built for a different platform is in play, so --platform has to be
-        # threaded through the config's "build.options" instead - the one
-        # lever `up`'s own build does respect. The devcontainer.json checked
-        # into the repo has to stay generic/interactive-safe (VS Code and
-        # other local users need Docker's normal native-platform behavior,
-        # not a value pinned for this CI matrix), so it's spliced into a
-        # generated sibling file instead. The generated file has to live
-        # inside the real $CONFIG_DIR (not a copy elsewhere, e.g. under
-        # /tmp): the CLI resolves local features like "./features/ocaml"
-        # against `<--workspace-folder>/.devcontainer` and rejects the
-        # feature path as escaping it if the config isn't actually there
-        # (--workspace-folder stays "." so the real checkout, submodules
-        # included, is what gets built). Sibling placement also means
-        # Dockerfile/features/ don't need copying - they already resolve.
-        # `grep -v` strips the file's leading `// For format details...`
-        # line comment, since jq can't parse JSONC. Left in place (not
-        # cleaned up) since later steps' `devcontainer exec` calls - via
-        # this action's `exec` output - reference it by path too.
-        CONFIG_DIR=$(dirname "$CONFIG_FILE")
-        GENERATED_CONFIG=$(mktemp "$CONFIG_DIR/devcontainer.generated.XXXXXX.json")
-        grep -v '^[[:space:]]*//' "$CONFIG_FILE" | jq --arg platform "$PLATFORM" \
-          'if .build then .build.options = ((.build.options // []) + ["--platform=" + $platform]) else . end' \
-          > "$GENERATED_CONFIG"
-        CONFIG_ARG="--config $GENERATED_CONFIG"
         old_id=''
         if docker pull $IMAGE_ID:$TAG; then
           old_id=$(docker image inspect $IMAGE_ID:$TAG --format "{{.ID}}")
         fi
         echo "::group::build"
-        env BUILDKIT_PROGRESS=plain devcontainer build --image-name $IMAGE_ID --cache-from $IMAGE_ID:$TAG --workspace-folder . $CONFIG_ARG
+        env BUILDKIT_PROGRESS=plain devcontainer build --image-name $IMAGE_ID --cache-from $IMAGE_ID:$TAG --platform "$PLATFORM" --workspace-folder . $CONFIG_ARG
         echo "::group::up"
         env BUILDKIT_PROGRESS=plain devcontainer up --workspace-folder . $CONFIG_ARG
         # PLATFORM is passed through to commands run via the exec prefix too
