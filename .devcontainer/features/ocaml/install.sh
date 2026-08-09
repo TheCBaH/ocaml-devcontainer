@@ -169,10 +169,12 @@ fi
 # Only the packages declared optional may be dropped; anything in PACKAGES or
 # PIN_PACKAGES that opam cannot install must still fail the build.
 for pkg in ${OPTIONAL_OPAM_PACKAGES}; do
-    if [ -n "$(opam list --available -s "$pkg")" ]; then
+    # A solver dry run is required here: `opam list --installable` can still
+    # match packages whose `available:` filter rejects the current architecture.
+    if opam install --show-actions "$pkg" > /dev/null 2>&1; then
         OPAM_PACKAGES="${OPAM_PACKAGES} ${pkg}"
     else
-        echo "Skipping optional package '$pkg': not available for this switch/platform" >&2
+        echo "Skipping optional package '$pkg': not installable for this switch/platform" >&2
     fi
 done
 
