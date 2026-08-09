@@ -4,6 +4,7 @@ set -x
 
 echo "Activating feature 'OCaml'"
 PACKAGES=${PACKAGES:-$@}
+BASE_PACKAGES=${BASE_PACKAGES-"dune ocaml-lsp-server ocamlformat ocamlformat-rpc"}
 OPTIONAL_PACKAGES=${OPTIONAL_PACKAGES:-}
 SYSTEM_PACKAGES=${SYSTEM_PACKAGES:-}
 PIN_PACKAGES=${PIN_PACKAGES:-}
@@ -13,7 +14,7 @@ OPAM_OPTIONS=''
 if [ -n "${OPTIONS:-}" ]; then
     OPAM_OPTIONS="--packages=ocaml-variants.${OCAML_VERSION}+options,${OPTIONS}"
 fi
-echo "Selected OCaml:$OCAML_VERSION packages: $PACKAGES optional: ${OPTIONAL_PACKAGES} with ${OPAM_OPTIONS} ${SYSTEM_PACKAGES}"
+echo "Selected OCaml:$OCAML_VERSION base packages: ${BASE_PACKAGES} packages: $PACKAGES optional: ${OPTIONAL_PACKAGES} with ${OPAM_OPTIONS} ${SYSTEM_PACKAGES}"
 
 # From https://github.com/devcontainers/features/blob/main/src/git/install.sh
 apt_get_update()
@@ -106,14 +107,8 @@ if [ -n "${REPOSITORIES}" ]; then
     opam update
 fi
 
-BASE_PACKAGES="\
- dune\
- ocaml-lsp-server\
- ocamlformat\
- ocamlformat-rpc\
-"
-OPAM_PACKAGES="${BASE_PACKAGES}"
-for pkg in ${PACKAGES}; do
+OPAM_PACKAGES=""
+for pkg in ${BASE_PACKAGES} ${PACKAGES}; do
     case "$pkg" in
         *#*)
             pkg_name=$(echo "$pkg" | cut -d'#' -f1)
@@ -178,7 +173,9 @@ for pkg in ${OPTIONAL_OPAM_PACKAGES}; do
     fi
 done
 
-opam install ${OPAM_PACKAGES}
+if [ -n "${OPAM_PACKAGES}" ]; then
+    opam install ${OPAM_PACKAGES}
+fi
 
 opam clean --repo-cache
 opam list
