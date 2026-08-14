@@ -32,7 +32,14 @@ jobs:
         platform: ${{ matrix.platform }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: smoke test (devcontainer)
-      run: ${{ steps.devcontainer.outputs.exec }} echo "hello world"
+      run: |
+        ${{ steps.devcontainer.outputs.exec }} sh -ceu '
+          echo "hello world"
+          if [ "$PLATFORM" = linux/s390x ]; then
+            test "$(dpkg --print-architecture)" = s390x
+            opam exec -- ocamlc -config | grep -q "^architecture: s390x$"
+          fi
+        '
   devcontainers-cli:
     runs-on: ${{ matrix.os }}
     strategy:

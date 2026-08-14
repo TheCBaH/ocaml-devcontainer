@@ -28,6 +28,7 @@ jobs:
             v5 = ver.startswith("5")
             matrix.append({"os": "ubuntu-24.04",     "ocaml_version": ver, "platform": "linux/amd64"})
             matrix.append({"os": "ubuntu-24.04-arm", "ocaml_version": ver, "platform": "linux/arm64"})
+            matrix.append({"os": "ubuntu-24.04",     "ocaml_version": ver, "platform": "linux/s390x"})
             if not v5:
                 matrix.append({"os": "ubuntu-24.04",     "ocaml_version": ver, "platform": "linux/i386"})
                 matrix.append({"os": "ubuntu-24.04-arm", "ocaml_version": ver, "platform": "linux/arm/v7"})

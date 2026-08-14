@@ -33,11 +33,28 @@ jobs:
         echo 'EXEC=${{ steps.devcontainer.outputs.exec }}' >> $GITHUB_ENV
     - name: info
       run: |
-        ${{ env.EXEC }} sh -c 'uname -m && getconf LONG_BIT && opam exec -- ocaml --version'
+        ${{ env.EXEC }} sh -c '
+          uname -m
+          dpkg --print-architecture
+          getconf LONG_BIT
+          opam exec -- ocamlc -config | grep "^architecture:"
+          opam exec -- ocaml --version
+        '
+    - name: verify s390x target
+      if: ${{ matrix.platform == 'linux/s390x' }}
+      run: |
+        ${{ env.EXEC }} sh -ceu '
+          test "$(dpkg --print-architecture)" = s390x
+          test "$(getconf LONG_BIT)" = 64
+          opam exec -- ocamlc -config | grep -q "^architecture: s390x$"
+        '
     - name: build
       run: |
         ${{ env.EXEC }} make
         file _build/default/main.exe
+        if [ "${{ matrix.platform }}" = linux/s390x ]; then
+          file _build/default/main.exe | grep -E 'IBM S/390|s390'
+        fi
         ls -lh _build/default/main.exe
     - name: run
       run: |
