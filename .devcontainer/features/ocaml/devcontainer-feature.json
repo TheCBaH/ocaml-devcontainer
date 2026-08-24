@@ -1,8 +1,8 @@
 {
     "name": "ocaml/opam toolchains",
     "id": "ocaml",
-    "version": "0.0.5",
-    "description": "Install ocaml/opam toolchains",
+    "version": "0.0.6",
+    "description": "Install ocaml/opam toolchains (Debian/Ubuntu apt or Gentoo portage)",
     "options": {
         "base-packages": {
             "type": "string",
