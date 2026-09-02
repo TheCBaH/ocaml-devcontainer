@@ -10,6 +10,7 @@ SYSTEM_PACKAGES=${SYSTEM_PACKAGES:-}
 PIN_PACKAGES=${PIN_PACKAGES:-}
 REPOSITORIES=${REPOSITORIES:-}
 OCAML_VERSION=${VERSION:-4.14.3}
+OCAML_VERSION_OVERRIDES=${OCAML_VERSION_OVERRIDES:-}
 OPAM_OPTIONS=''
 if [ -n "${OPTIONS:-}" ]; then
     OPAM_OPTIONS="--packages=ocaml-variants.${OCAML_VERSION}+options,${OPTIONS}"
@@ -160,6 +161,38 @@ if [ -n "${PIN_PACKAGES}" ]; then
     done
     IFS="$OLDIFS"
 fi
+
+# A version override is a release pin qualified by an OCaml-version shell glob,
+# e.g. "yojson#2.2.2@4.12.*". Apply these after generic pins so a devcontainer
+# author can override an otherwise unconditional package choice for one switch.
+for entry in ${OCAML_VERSION_OVERRIDES}; do
+    case "$entry" in
+        *@*)
+            pin_spec=${entry%@*}
+            ocaml_pattern=${entry##*@}
+            ;;
+        *)
+            echo "Invalid ocaml-version-overrides entry '$entry': expected name#version@ocaml-pattern" >&2
+            exit 1
+            ;;
+    esac
+    case "$pin_spec" in
+        *#*)
+            pkg_name=$(echo "$pin_spec" | cut -d'#' -f1)
+            pkg_ver=$(echo "$pin_spec" | cut -d'#' -f2)
+            ;;
+        *)
+            echo "Invalid ocaml-version-overrides entry '$entry': expected name#version@ocaml-pattern" >&2
+            exit 1
+            ;;
+    esac
+    case "$OCAML_VERSION" in
+        $ocaml_pattern)
+            echo "Applying OCaml-version override '$pin_spec' for $OCAML_VERSION (pattern: $ocaml_pattern)"
+            opam pin add --no-action "$pkg_name" "$pkg_ver"
+            ;;
+    esac
+done
 
 # Only the packages declared optional may be dropped; anything in PACKAGES or
 # PIN_PACKAGES that opam cannot install must still fail the build.

@@ -14,7 +14,8 @@
         },
         "./features/ocaml": {
             "version": "${localEnv:OCAML_VERSION}",
-            "packages": "utop ocamlformat#0.28.1"
+            "packages": "utop ocamlformat#0.28.1",
+            "ocaml-version-overrides": "pp#1.2.0@4.12.* yojson#2.2.2@4.12.*"
         },
     },
     "customizations": {
